@@ -46,10 +46,14 @@ loadSublinesButton.addEventListener("click", function(){
     let selectedRows = table.getSelectedData();
 
     if (selectedRows.length > 0) {
-        sublinesWindow = window.open('sublines.html', 'Subline stats', 'width=1920, height=1080');
-        sublinesWindow.addEventListener('load', () => {
-            sublinesWindow.postMessage(selectedRows[0]);
-        }, false);
+        // create nav bar element
+        // create table element
+        // set table and table element and navbar button together
+        // setUpNavButton(button)
+
+        // get data
+        // set data to new table
+        // click button
     }
 });
 

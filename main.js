@@ -1,4 +1,4 @@
-const { app, BrowserWindow, BrowserView } = require('electron');
+const { app, BrowserWindow } = require('electron');
 
 const createWindow = () => {
     const newWindow = new BrowserWindow({
@@ -13,11 +13,7 @@ const createWindow = () => {
         }
     });
   
-    newWindow.loadFile('src/stats.html');
-    // const view = new BrowserView();
-    // newWindow.setBrowserView(view);
-    // view.setBounds({ x: 0, y: 0, width: 300, height: 300 })
-    // view.webContents.loadFile('src/stats.html');
+    newWindow.loadFile('src/index.html');
 
     newWindow.once('ready-to-show', () => {
         newWindow.show();

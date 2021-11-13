@@ -110,8 +110,6 @@ window.addEventListener("message", (event) => {
     };
 
     loadData(message).then((tableData) => {
-        table.setData(tableData).then(function() {
-            //turn off data loading html
-        });
+        table.setData(tableData);
     });
 }, false);
