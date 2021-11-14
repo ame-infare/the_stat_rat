@@ -1,19 +1,23 @@
+const Tabulator = require('tabulator-tables');
+
 window.$ = window.jquery = require("jquery");
 
 //$('#stats').load('./stats.html');
 
-// function setTemplate(link, element) {
-//     fetch(link)
-//         .then(response => {
-//             return response.text();
-//         })
-//         .then(template => {
-//             element.innerHTML = template;
-            
-//         });
-// }
+// an object to store all tables
+let allTables = {sublines: {}};
 
-// setTemplate('./stats.html', document.getElementById('stats'));
+function setTemplate(link, containerElement, tableId) {
+    fetch(link)
+        .then(response => {
+            return response.text();
+        })
+        .then(template => {
+            containerElement.innerHTML = template;
+            let tableContents = containerElement.querySelector('.table-content');
+            tableContents.id = tableId;
+        });
+}
 
 // nav buttons and showing selected table
 function setUpNavButton(button) {
@@ -22,6 +26,7 @@ function setUpNavButton(button) {
             return;
         }
 
+        navButtons = document.querySelectorAll('#nav li');
         navButtons.forEach(button => {
             button.classList.remove('selected');
         });

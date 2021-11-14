@@ -11,28 +11,23 @@
 <body>
     <ul id="nav">
         <li class="selected" data-tab="stats">STATS</li>
-        <li data-tab="sublines">SUBLINES</li>
-        <li data-tab="transactions">TRANSACTIONS</li>
     </ul>
 
-    <div id="stats" class="active table">
-        <div>
-            <button id="load-selected-sites">Load Selected(<span id="num-selected">0</span>)</button>
+    <div id="tables-container">
+
+        <div id="stats" class="active table">
+            <div>
+                <button id="load-selected-sites">Load Selected(<span id="num-selected">0</span>)</button>
+            </div>
+            
+            <div id="table-stats"></div>   
         </div>
-        
-        <div id="table-stats"></div>   
+
     </div>
 
-    <div id="sublines" class="table">
-        <p>SUBLINES</p>
-    </div>
-
-    <div id="transactions" class="table">
-        <p>TXES</p>
-    </div>
-
-    <script src="./stats.js"></script>
-    <script src="./loadTableData.js"></script>
     <script src="./index.js"></script>
+    <script src="./loadTableData.js"></script>
+    <script src="./stats.js"></script>
+    <script src="./sublines.js"></script>
 </body>
 </html>

@@ -1,9 +1,7 @@
-const Tabulator = require('tabulator-tables');
-
 // Stats Table
-let table = new Tabulator("#table-stats", {
+allTables['stats'] = new Tabulator("#table-stats", {
     layout: "fitDataFill",
-    maxHeight: "970",
+    maxHeight: "600",
     selectable: 1,
 
     columns: [
@@ -36,37 +34,59 @@ let table = new Tabulator("#table-stats", {
 
 // Update how many BS are selected
 const numOfSelectedBs = document.getElementById("num-selected");
-table.on('rowClick', function(e, row){
+allTables.stats.on('rowClick', function(e, row){
     numOfSelectedBs.innerText = this.getSelectedRows().length;
 });
 
 // Load Subline Data
 const loadSublinesButton = document.getElementById("load-selected-sites");
+let numOfSublineTabs = 0;
+
 loadSublinesButton.addEventListener("click", function(){
-    let selectedRows = table.getSelectedData();
+    let selectedRows = allTables.stats.getSelectedData();
 
     if (selectedRows.length > 0) {
-        // create nav bar element
-        // create table element
-        // set table and table element and navbar button together
-        // setUpNavButton(button)
+        let elementId = 'sublines-' + ++numOfSublineTabs;
 
-        // get data
-        // set data to new table
+        // create nav bar button
+        let navBarItem = document.createElement('li');
+        navBarItem.dataset.tab = elementId;
+        navBarItem.innerText = selectedRows[0].booking_site + ' ' + selectedRows[0].key;
+        let newButton = document.getElementById('nav').appendChild(navBarItem);
+        setUpNavButton(newButton);
+
+        // create table element
+        let newTableTag = document.createElement('div');
+        newTableTag.classList.add('table');
+        newTableTag.id = elementId;
+
+        setTemplate('./sublines.html', newTableTag, elementId + '-table');
+        document.getElementById('tables-container').appendChild(newTableTag);
+
+        // get and set data to the table
+        let message = {
+            action: 'sublines',
+            data: selectedRows[0]
+        };
+    
+        loadData(message).then((tableData) => {
+            allTables.sublines[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
+        });
+
         // click button
     }
 });
 
 // Initial Stats Load
-table.on("tableBuilt", function() {
+allTables.stats.on("tableBuilt", function() {
     let message = {
         action: 'stats'
     };
 
     loadData(message).then((tableData) => {
-        table.setData(tableData).then(function() {
+        allTables.stats.setData(tableData).then(function() {
             //turn off data loading html
-            table.off("tableBuilt");
+            allTables.stats.off("tableBuilt");
         });
     });
 });
