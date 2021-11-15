@@ -5,7 +5,7 @@ window.$ = window.jquery = require("jquery");
 //$('#stats').load('./stats.html');
 
 // an object to store all tables
-let allTables = {sublines: {}};
+let allTables = {};
 
 function setTemplate(link, containerElement, tableId) {
     fetch(link)
@@ -21,7 +21,15 @@ function setTemplate(link, containerElement, tableId) {
 
 // nav buttons and showing selected table
 function setUpNavButton(button) {
-    button.addEventListener("click", function(){
+    let closeTabButton = button.querySelector('.close-tab');
+    closeTabButton.addEventListener('click', function(){
+        let tableIdToClose = closeTabButton.parentNode.dataset.tab;
+        allTables[tableIdToClose].destroy();
+        document.getElementById(tableIdToClose).remove();
+        closeTabButton.parentNode.remove();
+    });
+
+    button.addEventListener('click', function(){
         if (button.classList.contains('selected')) {
             return;
         }

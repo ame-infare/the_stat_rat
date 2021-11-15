@@ -3,10 +3,12 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: rgb(4,37,47);
+    background-color: rgb(0, 0, 0);
+    border-bottom:  3px solid rgb(0,183,190);
 }
 
 #nav li {
+    position: relative;
     float: left;
     display: block;
     color: rgb(0,183,190);
@@ -14,8 +16,10 @@
     padding: 14px 16px;
     text-decoration: none;
     cursor: pointer;
+    margin: 1px;
+
     border: 1px solid rgb(0,183,190);
-    margin: 1px 1px;
+    border-radius: 8px 8px 0 0;
 }
 
 #nav li:hover {
@@ -25,6 +29,7 @@
 #nav li.selected {
     background-color: rgb(0,183,190);
     color: rgb(4,37,47);
+    margin: 2px 1px 0 1px;
 }
 
 .table {
@@ -33,4 +38,20 @@
 
 .table.active {
     display: block;
+}
+
+.close-tab {
+    font-size: 8px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: white;
+
+    border-radius: 0 8px 0 0;
+}
+
+.close-tab:hover {
+    font-size: 10px;
+    background-color: khaki;
+    transition: 0.2s;
 }

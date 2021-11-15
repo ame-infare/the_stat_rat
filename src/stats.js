@@ -52,6 +52,12 @@ loadSublinesButton.addEventListener("click", function(){
         let navBarItem = document.createElement('li');
         navBarItem.dataset.tab = elementId;
         navBarItem.innerText = selectedRows[0].booking_site + ' ' + selectedRows[0].key;
+
+        let closeTabButton = document.createElement('span');
+        closeTabButton.innerText = String.fromCodePoint(0x274C);
+        closeTabButton.classList.add('close-tab');
+        navBarItem.appendChild(closeTabButton);
+
         let newButton = document.getElementById('nav').appendChild(navBarItem);
         setUpNavButton(newButton);
 
@@ -70,7 +76,7 @@ loadSublinesButton.addEventListener("click", function(){
         };
     
         loadData(message).then((tableData) => {
-            allTables.sublines[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
+            allTables[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
         });
 
         // click button
