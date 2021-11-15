@@ -1,10 +1,19 @@
 // Stats Table
 allTables['stats'] = new Tabulator("#table-stats", {
     layout: "fitDataFill",
-    maxHeight: "600",
+    maxHeight: "400",
     selectable: 1,
+    responsiveLayout: "collapse",
+    responsiveLayoutCollapseStartOpen: false,
+    responsiveLayoutCollapseFormatter: function(data) {
+        console.log(data[0]);
+        var list = document.createElement("ul");
+    
+        return list;
+    },
 
     columns: [
+        {formatter: "responsiveCollapse"},
         {title: "Prio", field: "prio"},
         {title: "Booking site", field: "booking_site", headerFilter: true},
         {title: "bs Id", field: "bs_id", headerFilter: true},
@@ -29,6 +38,14 @@ allTables['stats'] = new Tabulator("#table-stats", {
         {title: "%tx_limit", field: "%tx_limit"},
         {title: "Issue date", field: "issue_date"},
         {title: "Aff profiles", field: "affected_profiles", width: 150},
+        // {
+        //     title: "Travel info",
+        //     columns: [
+        //         {title: "%tx_limit", field: "%tx_limit"},
+        //         {title: "Issue date", field: "issue_date"},
+        //         {title: "Aff profiles", field: "affected_profiles", width: 150},
+        //     ]
+        // },
     ]
 });
 

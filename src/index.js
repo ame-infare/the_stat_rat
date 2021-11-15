@@ -1,9 +1,5 @@
 const Tabulator = require('tabulator-tables');
 
-window.$ = window.jquery = require("jquery");
-
-//$('#stats').load('./stats.html');
-
 // an object to store all tables
 let allTables = {};
 

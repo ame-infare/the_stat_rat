@@ -2,13 +2,19 @@ function createSublinesTable(tableId, tableData) {
     return new Tabulator(tableId, {
         data: tableData,
         layout: "fitDataFill",
-        maxHeight: "600",
+        maxHeight: "400",
         selectable: true,
-        //responsiveLayout: "collapse",
-        //responsiveLayoutCollapseStartOpen: false,
+        responsiveLayout: "collapse",
+        responsiveLayoutCollapseStartOpen: false,
+        responsiveLayoutCollapseFormatter: function(data) {
+            console.log(data[0]);
+            var list = document.createElement("ul");
+    
+            return list;
+        },
     
         columns:[
-            //{formatter: "responsiveCollapse", headerSort: false, width: 30},
+            {formatter: "responsiveCollapse"},
             {title: "Subline", field: "subscription_line_id", headerFilter: true},
             {title: "Last Run", field: "run_date_utc", headerFilter: true},
             {title: "Profile", field: "profile_id", headerFilter: true},

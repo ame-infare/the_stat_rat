@@ -12,7 +12,6 @@
     "electron": "^15.3.0"
   },
   "dependencies": {
-    "jquery": "^3.6.0",
     "python-shell": "^3.0.1",
     "tabulator-tables": "^5.0.6"
   }
