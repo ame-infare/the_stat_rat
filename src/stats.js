@@ -11,8 +11,7 @@ allTables['stats'] = new Tabulator("#table-stats", {
         {
             title: "Type", field: "type", 
             headerFilter: true, headerFilterParams: {values: true},
-            headerFilterFunc : "=",
-            editor: "select", editable: false
+            headerFilterFunc : "="
         },
         {title: "Code", field: "code"},
         {title: "Filter id", field: "filter_id"},
@@ -30,12 +29,6 @@ allTables['stats'] = new Tabulator("#table-stats", {
         {title: "Issue date", field: "issue_date"},
         {title: "Aff profiles", field: "affected_profiles", width: 150},
     ]
-});
-
-// Update how many BS are selected
-const numOfSelectedBs = document.getElementById("num-selected");
-allTables.stats.on('rowClick', function(e, row){
-    numOfSelectedBs.innerText = this.getSelectedRows().length;
 });
 
 // Load Subline Data
@@ -78,21 +71,48 @@ loadSublinesButton.addEventListener("click", function(){
         loadData(message).then((tableData) => {
             allTables[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
         });
-
-        // click button
     }
 });
 
 // Initial Stats Load
-allTables.stats.on("tableBuilt", function() {
+allTables.stats.on('tableBuilt', function() {
     let message = {
         action: 'stats'
     };
 
     loadData(message).then((tableData) => {
         allTables.stats.setData(tableData).then(function() {
+
             //turn off data loading html
-            allTables.stats.off("tableBuilt");
+            allTables.stats.off('tableBuilt');
         });
+    });
+});
+
+
+const numOfSelectedBs = document.getElementById("num-selected");
+let allSelections = [];
+allTables.stats.on('rowSelected', function(row) {
+    if (!allSelections.includes(row)) {
+        allSelections.push(row);
+    }
+
+    numOfSelectedBs.innerText = allSelections.length;
+});
+
+allTables.stats.on('rowDeselected', function(row) {
+    const index = allSelections.indexOf(row);
+    if (index > -1) {
+        allSelections.splice(index, 1);
+    }
+
+    numOfSelectedBs.innerText = allSelections.length;
+});
+
+allTables.stats.on('dataSorted', function(sorters, rows){
+    rows.forEach(row => {
+        if (allSelections.includes(row)) {
+            allTables.stats.selectRow(row);
+        }
     });
 });
