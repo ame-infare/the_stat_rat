@@ -6,6 +6,7 @@ function createSublinesTable(tableId, tableData) {
         selectable: true,
     
         columns:[
+            {title: "key", field: "key", headerFilter: true},
             {title: "Subline", field: "subscription_line_id", headerFilter: true},
             {title: "Last Run", field: "run_date_utc", headerFilter: true},
             {title: "Profile", field: "profile_id", headerFilter: true},

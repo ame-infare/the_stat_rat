@@ -2,7 +2,7 @@
 allTables['stats'] = new Tabulator("#table-stats", {
     layout: "fitDataFill",
     maxHeight: "650",
-    selectable: 1,
+    selectable: true,
 
     columns: [
         {title: "Prio", field: "prio"},
@@ -36,15 +36,20 @@ const loadSublinesButton = document.getElementById("load-selected-sites");
 let numOfSublineTabs = 0;
 
 loadSublinesButton.addEventListener("click", function(){
-    let selectedRows = allTables.stats.getSelectedData();
-
     if (selectedRows.length > 0) {
         let elementId = 'sublines-' + ++numOfSublineTabs;
+        let rowsData = Array.from(selectedRows, x => x.getData());
 
         // create nav bar button
         let navBarItem = document.createElement('li');
         navBarItem.dataset.tab = elementId;
-        navBarItem.innerText = selectedRows[0].booking_site + ' ' + selectedRows[0].key;
+        for (let index = 0; index < rowsData.length; index++) {
+            if (index > 0) {
+                navBarItem.innerText += ', '
+            }
+
+            navBarItem.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
+        }
 
         let closeTabButton = document.createElement('span');
         closeTabButton.innerText = String.fromCodePoint(0x274C);
@@ -65,12 +70,17 @@ loadSublinesButton.addEventListener("click", function(){
         // get and set data to the table
         let message = {
             action: 'sublines',
-            data: selectedRows[0]
+            data: rowsData
         };
-    
+
         loadData(message).then((tableData) => {
             allTables[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
         });
+
+        //deselect all rows and clear selected rows var
+        selectedRows = [];
+        allTables.stats.deselectRow();
+        numOfSelectedBs.innerText = '0';
     }
 });
 
@@ -91,27 +101,27 @@ allTables.stats.on('tableBuilt', function() {
 
 
 const numOfSelectedBs = document.getElementById("num-selected");
-let allSelections = [];
+let selectedRows = [];
 allTables.stats.on('rowSelected', function(row) {
-    if (!allSelections.includes(row)) {
-        allSelections.push(row);
+    if (!selectedRows.includes(row)) {
+        selectedRows.push(row);
     }
 
-    numOfSelectedBs.innerText = allSelections.length;
+    numOfSelectedBs.innerText = selectedRows.length;
 });
 
 allTables.stats.on('rowDeselected', function(row) {
-    const index = allSelections.indexOf(row);
+    const index = selectedRows.indexOf(row);
     if (index > -1) {
-        allSelections.splice(index, 1);
+        selectedRows.splice(index, 1);
     }
 
-    numOfSelectedBs.innerText = allSelections.length;
+    numOfSelectedBs.innerText = selectedRows.length;
 });
 
 allTables.stats.on('dataSorted', function(sorters, rows){
     rows.forEach(row => {
-        if (allSelections.includes(row)) {
+        if (selectedRows.includes(row)) {
             allTables.stats.selectRow(row);
         }
     });

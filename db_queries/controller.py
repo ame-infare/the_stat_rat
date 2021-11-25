@@ -23,27 +23,37 @@ def get_db_data(query):
     return table_data
 
 def send_to_electron(table_data):
-    print(table_data.to_json(orient="records"))
+    print(table_data.to_json(orient='records'))
 
 def get_query(json_message):
-    action = json_message["action"]
+    action = json_message['action']
 
     if action == 'stats':
         return 'exec beclu4.Vacation_Stats.dbo.usp_vacation_booking_site_stats'
+
     elif action == 'sublines':
         subline_data = json_message['data']
-        return ('SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats\n'
-                 f'WHERE booking_site_id = {subline_data["bs_id"]}\n'
-                 f'AND collection_type = \'{subline_data["type"]}\''
-                 'AND relevant > 0')
 
-def controller():
-    json_message = get_message()
+        db_query = ('SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats\n'
+            'WHERE relevant > 0\nAND (')
+
+        for count, booking_site in enumerate(subline_data):
+            if count > 0:
+                db_query += 'OR '
+            db_query += f'[key] = \'{booking_site["bs_id"]}{booking_site["type"]}\'\n'
+
+        db_query += ')'
+        return db_query
+
+def controller(test_json=None):
+    json_message = get_message() if not test_json else json.loads(test_json)
 
     query = get_query(json_message)
 
     table_data = get_db_data(query)
 
     send_to_electron(table_data)
+
+test_json = '{"action":"sublines","data":[{"prio":"3","booking_site":"Virgin Atlantic Vacations","bs_id":2239,"type":"C","code":"VS","filter_id":10176399,"subs":5,"d_err":0,"sub_mis":0,"%miss":0,"valid":2862,"%inv":0,"tx_inv":0,"%tx_inv":0,"%tx_miss":0,"%tx_limit":0,"issue_date":null,"affected_profiles":"BA_C","key":"2239C"},{"prio":"3","booking_site":"Virgin Holidays Vacations","bs_id":2240,"type":"FC","code":"VS","filter_id":10176400,"subs":13,"d_err":0,"sub_mis":0,"%miss":0,"valid":9452,"%inv":0,"tx_inv":0,"%tx_inv":0,"%tx_miss":14,"%tx_limit":2,"issue_date":null,"affected_profiles":"BA_FC,VS_FC","key":"2240FC"}]}'
 
 controller()
