@@ -1,7 +1,7 @@
 // Stats Table
 allTables['stats'] = new Tabulator("#table-stats", {
-    layout: "fitDataFill",
-    maxHeight: "650",
+    layout: "fitData",
+    height: "100%",
     selectable: true,
 
     columns: [

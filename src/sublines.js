@@ -1,8 +1,8 @@
 function createSublinesTable(tableId, tableData) {
     return new Tabulator(tableId, {
         data: tableData,
-        layout: "fitDataFill",
-        maxHeight: "650",
+        layout: "fitData",
+        height: "100%",
         selectable: true,
     
         columns:[

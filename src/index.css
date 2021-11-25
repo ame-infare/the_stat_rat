@@ -45,13 +45,28 @@ body {
 
 .table {
     opacity: 0;
-    position: absolute;
     z-index: 1;
 }
 
 .table.active {
     opacity: 100;
+    z-index: 3;
+}
+
+#tables-container {
+    position: relative;
+    height: 800px;
+    width: auto;
+}
+
+#separator {
     z-index: 2;
+    background-color: black;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .close-tab {
