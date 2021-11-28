@@ -2,7 +2,7 @@ function createSublinesTable(tableId, tableData) {
     return new Tabulator(tableId, {
         data: tableData,
         layout: "fitData",
-        height: "100%",
+        maxHeight: "100%",
         selectable: true,
     
         columns:[
