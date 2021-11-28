@@ -1,34 +1,10 @@
-// Stats Table
-allTables['stats'] = new Tabulator("#table-stats", {
-    layout: "fitData",
-    maxHeight: "100%",
-    selectable: true,
 
-    columns: [
-        {title: "Prio", field: "prio"},
-        {title: "Booking site", field: "booking_site", headerFilter: true},
-        {title: "bs Id", field: "bs_id", headerFilter: true},
-        {
-            title: "Type", field: "type", 
-            headerFilter: true, headerFilterParams: {values: true},
-            headerFilterFunc : "="
-        },
-        {title: "Code", field: "code"},
-        {title: "Filter id", field: "filter_id"},
-        {title: "Subs", field: "subs"},
-        {title: "d_err", field: "d_err"},
-        {title: "no_res", field: "no_res"},
-        {title: "Subs miss", field: "sub_mis"},
-        {title: "%miss", field: "%miss"},
-        {title: "Valid", field: "valid"},
-        {title: "%inv", field: "%inv"},
-        {title: "tx_inv", field: "tx_inv"},
-        {title: "%tx_inv", field: "%tx_inv"},
-        {title: "%tx_miss", field: "%tx_miss"},
-        {title: "%tx_limit", field: "%tx_limit"},
-        {title: "Issue date", field: "issue_date"},
-        {title: "Aff profiles", field: "affected_profiles", width: 150},
-    ]
+const numOfSelectedBs = document.getElementById("num-selected");
+let selectedRows = [];
+
+// Initial Stats Load
+loadData({action: 'stats'}).then((tableData) => {
+    allTables['stats'] = createTable('stats', '#table-stats', tableData)
 });
 
 // Load Subline Data
@@ -82,47 +58,4 @@ loadSublinesButton.addEventListener("click", function(){
         allTables.stats.deselectRow();
         numOfSelectedBs.innerText = '0';
     }
-});
-
-// Initial Stats Load
-allTables.stats.on('tableBuilt', function() {
-    let message = {
-        action: 'stats'
-    };
-
-    loadData(message).then((tableData) => {
-        allTables.stats.setData(tableData).then(function() {
-
-            //turn off data loading html
-            allTables.stats.off('tableBuilt');
-        });
-    });
-});
-
-
-const numOfSelectedBs = document.getElementById("num-selected");
-let selectedRows = [];
-allTables.stats.on('rowSelected', function(row) {
-    if (!selectedRows.includes(row)) {
-        selectedRows.push(row);
-    }
-
-    numOfSelectedBs.innerText = selectedRows.length;
-});
-
-allTables.stats.on('rowDeselected', function(row) {
-    const index = selectedRows.indexOf(row);
-    if (index > -1) {
-        selectedRows.splice(index, 1);
-    }
-
-    numOfSelectedBs.innerText = selectedRows.length;
-});
-
-allTables.stats.on('dataSorted', function(sorters, rows){
-    rows.forEach(row => {
-        if (selectedRows.includes(row)) {
-            allTables.stats.selectRow(row);
-        }
-    });
 });

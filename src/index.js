@@ -1,5 +1,3 @@
-const Tabulator = require('tabulator-tables');
-
 // an object to store all tables
 let allTables = {};
 
