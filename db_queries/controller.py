@@ -57,4 +57,4 @@ def controller(test_json=None):
 
 test_json = '{"action":"sublines","data":[{"prio":"3","booking_site":"Virgin Atlantic Vacations","bs_id":2239,"type":"C","code":"VS","filter_id":10176399,"subs":5,"d_err":0,"sub_mis":0,"%miss":0,"valid":2862,"%inv":0,"tx_inv":0,"%tx_inv":0,"%tx_miss":0,"%tx_limit":0,"issue_date":null,"affected_profiles":"BA_C","key":"2239C"},{"prio":"3","booking_site":"Virgin Holidays Vacations","bs_id":2240,"type":"FC","code":"VS","filter_id":10176400,"subs":13,"d_err":0,"sub_mis":0,"%miss":0,"valid":9452,"%inv":0,"tx_inv":0,"%tx_inv":0,"%tx_miss":14,"%tx_limit":2,"issue_date":null,"affected_profiles":"BA_FC,VS_FC","key":"2240FC"}]}'
 
-controller(test_json)
+controller()
