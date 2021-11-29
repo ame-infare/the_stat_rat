@@ -1,6 +1,9 @@
 const Tabulator = require('tabulator-tables');
 
-function createTable(templateName, tableId, tableData) {
+// an object to store all tables
+let allTables = {};
+
+function createTable(templateName, tableId, tableData, selectionsButton = null) {
     let templates = {
         stats: {
             layout: "fitData",
@@ -35,6 +38,7 @@ function createTable(templateName, tableId, tableData) {
         },
 
         subs: {
+            data: tableData,
             layout: "fitData",
             maxHeight: "100%",
             selectable: true,
@@ -137,32 +141,37 @@ function createTable(templateName, tableId, tableData) {
     selectedTemplate = templates[templateName];
     selectedTemplate['data'] = tableData;
 
-    let newTable = new Tabulator(tableId, selectedTemplate);
+    allTables[tableId] = {};
+    let thisTable = allTables[tableId].table = new Tabulator(`#${tableId}`, selectedTemplate);
 
-    newTable.on('rowSelected', function(row) {
+    let selectedRows = allTables[tableId].selectedRows = [];
+
+    thisTable.on('rowSelected', function(row) {
         if (!selectedRows.includes(row)) {
             selectedRows.push(row);
         }
     
-        numOfSelectedBs.innerText = selectedRows.length;
+        if (selectionsButton) {
+            selectionsButton.innerText = selectedRows.length;
+        }
     });
     
-    newTable.on('rowDeselected', function(row) {
+    thisTable.on('rowDeselected', function(row) {
         const index = selectedRows.indexOf(row);
         if (index > -1) {
             selectedRows.splice(index, 1);
         }
     
-        numOfSelectedBs.innerText = selectedRows.length;
+        if (selectionsButton) {
+            selectionsButton.innerText = selectedRows.length;
+        }
     });
     
-    newTable.on('dataSorted', function(sorters, rows){
+    thisTable.on('dataSorted', function(sorters, rows){
         rows.forEach(row => {
             if (selectedRows.includes(row)) {
-                allTables.stats.selectRow(row);
+                thisTable.selectRow(row);
             }
         });
     });
-
-    return newTable;
 }

@@ -1,21 +1,21 @@
-
 const numOfSelectedBs = document.getElementById("num-selected");
-let selectedRows = [];
 
 // Initial Stats Load
 loadData({action: 'stats'}).then((tableData) => {
-    allTables['stats'] = createTable('stats', '#table-stats', tableData)
+    createTable('stats', 'stats', tableData, numOfSelectedBs);
 });
 
 // Load Subline Data
 const loadSublinesButton = document.getElementById("load-selected-sites");
-let numOfSublineTabs = 0;
+let numOfSublineTabsOpen = 0;
 
 loadSublinesButton.addEventListener("click", function(){
-    if (selectedRows.length > 0) {
-        let elementId = 'sublines-' + ++numOfSublineTabs;
-        let rowsData = Array.from(selectedRows, x => x.getData());
+    let selectedRows = allTables.stats.selectedRows;
 
+    if (selectedRows.length > 0) {
+        let elementId = 'sublines' + ++numOfSublineTabsOpen;
+        let rowsData = Array.from(selectedRows, x => x.getData());
+        
         // create nav bar button
         let navBarItem = document.createElement('li');
         navBarItem.dataset.tab = elementId;
@@ -28,7 +28,7 @@ loadSublinesButton.addEventListener("click", function(){
         }
 
         let closeTabButton = document.createElement('span');
-        closeTabButton.innerText = String.fromCodePoint(0x274C);
+        closeTabButton.innerText = String.fromCodePoint(0x274C); // x emote icon
         closeTabButton.classList.add('close-tab');
         navBarItem.appendChild(closeTabButton);
 
@@ -50,12 +50,7 @@ loadSublinesButton.addEventListener("click", function(){
         };
 
         loadData(message).then((tableData) => {
-            allTables[elementId] = createSublinesTable(`#${elementId}-table`, tableData);
+            createTable('subs', elementId, tableData);
         });
-
-        //deselect all rows and clear selected rows var
-        selectedRows = [];
-        allTables.stats.deselectRow();
-        numOfSelectedBs.innerText = '0';
     }
 });

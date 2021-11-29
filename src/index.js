@@ -1,6 +1,3 @@
-// an object to store all tables
-let allTables = {};
-
 function setTemplate(link, containerElement, tableId) {
     fetch(link)
         .then(response => {
@@ -15,14 +12,17 @@ function setTemplate(link, containerElement, tableId) {
 
 // nav buttons and showing selected table
 function setUpNavButton(button) {
+
+    //close tab
     let closeTabButton = button.querySelector('.close-tab');
     closeTabButton.addEventListener('click', function(){
         let tableIdToClose = closeTabButton.parentNode.dataset.tab;
-        allTables[tableIdToClose].destroy();
+        allTables[tableIdToClose].table.destroy();
         document.getElementById(tableIdToClose).remove();
         closeTabButton.parentNode.remove();
     });
 
+    // change tab
     button.addEventListener('click', function(){
         if (button.classList.contains('selected')) {
             return;
