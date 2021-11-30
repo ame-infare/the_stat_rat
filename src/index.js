@@ -35,7 +35,7 @@ function setUpNavButton(button) {
 
         button.classList.add('selected');
 
-        let allTables = document.querySelectorAll('.table');
+        let allTables = document.querySelectorAll('.window');
         allTables.forEach(table => {
             table.classList.remove('active');
         });

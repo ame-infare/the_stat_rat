@@ -139,37 +139,38 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
     };
 
     selectedTemplate = templates[templateName];
-    selectedTemplate['data'] = tableData;
+    selectedTemplate.data = tableData;
 
-    allTables[tableId] = {};
-    let thisTable = allTables[tableId].table = new Tabulator(`#${tableId}`, selectedTemplate);
-
-    let selectedRows = allTables[tableId].selectedRows = [];
+    allTables[tableId] = {
+        table: new Tabulator(`#${tableId}`, selectedTemplate),
+        selectedRows: []
+    };
+    let thisTable = allTables[tableId].table; 
 
     thisTable.on('rowSelected', function(row) {
-        if (!selectedRows.includes(row)) {
-            selectedRows.push(row);
+        if (!allTables[tableId].selectedRows.includes(row)) {
+            allTables[tableId].selectedRows.push(row);
         }
     
         if (selectionsButton) {
-            selectionsButton.innerText = selectedRows.length;
+            selectionsButton.innerText = allTables[tableId].selectedRows.length;
         }
     });
     
     thisTable.on('rowDeselected', function(row) {
-        const index = selectedRows.indexOf(row);
+        const index = allTables[tableId].selectedRows.indexOf(row);
         if (index > -1) {
-            selectedRows.splice(index, 1);
+            allTables[tableId].selectedRows.splice(index, 1);
         }
     
         if (selectionsButton) {
-            selectionsButton.innerText = selectedRows.length;
+            selectionsButton.innerText = allTables[tableId].selectedRows.length;
         }
     });
     
     thisTable.on('dataSorted', function(sorters, rows){
         rows.forEach(row => {
-            if (selectedRows.includes(row)) {
+            if (allTables[tableId].selectedRows.includes(row)) {
                 thisTable.selectRow(row);
             }
         });
