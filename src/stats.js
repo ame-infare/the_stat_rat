@@ -22,23 +22,24 @@ loadSublinesButton.addEventListener("click", function(){
         selectedBsButton.innerText = '0';
         
         // create nav bar button
-        let navBarItem = document.createElement('li');
-        navBarItem.dataset.tab = `${elementId}-window`;
+        let navBarTemplate = await getTemplate('./templates/tabButton.html');
+        navBarTemplate.dataset.tab = `${elementId}-window`;
         for (let index = 0; index < rowsData.length; index++) {
             if (index > 0) {
-                navBarItem.innerText += ', '
+                navBarTemplate.innerText += ', '
             }
 
-            navBarItem.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
+            navBarTemplate.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
         }
 
-        let closeTabButton = document.createElement('span');
-        closeTabButton.innerText = String.fromCodePoint(0x274C); // x emote icon
-        closeTabButton.classList.add('close-tab');
-        navBarItem.appendChild(closeTabButton);
-
-        let newButton = document.getElementById('nav').appendChild(navBarItem);
+        let newButton = document.getElementById('nav').appendChild(navBarTemplate);
         setUpNavButton(newButton);
+
+        // containerElement.innerHTML = template;
+        // let tableContents = containerElement.querySelector('.table-content');
+        // tableContents.id = tableId;
+
+
 
         // create table element
         let newTableTag = document.createElement('div');
