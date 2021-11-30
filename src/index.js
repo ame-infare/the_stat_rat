@@ -11,13 +11,9 @@ function setTemplate(link, containerElement, tableId) {
 }
 
 async function getTemplate(path) {
-    return fetch(path)
-        .then(response => {
-            return response.text();
-        })
-        .then(template => {
-            return document.createRange().createContextualFragment(template);
-        });
+    const response = await fetch(path);
+    const template = await response.text();
+    return document.createRange().createContextualFragment(template);
 }
 
 // nav buttons and showing selected table

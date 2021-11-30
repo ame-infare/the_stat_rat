@@ -22,31 +22,29 @@ loadSublinesButton.addEventListener("click", function(){
         selectedBsButton.innerText = '0';
         
         // create nav bar button
-        let navBarTemplate = await getTemplate('./templates/tabButton.html');
-        navBarTemplate.dataset.tab = `${elementId}-window`;
+        let navBarTemplate = getTemplate('./templates/tabButton.html');
+        let tabButton = navBarTemplate.querySelector('li');
+        tabButton.dataset.tab = `${elementId}-window`;
         for (let index = 0; index < rowsData.length; index++) {
             if (index > 0) {
-                navBarTemplate.innerText += ', '
+                tabButton.innerText += ', '
             }
 
-            navBarTemplate.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
+            tabButton.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
         }
 
         let newButton = document.getElementById('nav').appendChild(navBarTemplate);
         setUpNavButton(newButton);
 
-        // containerElement.innerHTML = template;
-        // let tableContents = containerElement.querySelector('.table-content');
-        // tableContents.id = tableId;
-
-
-
         // create table element
-        let newTableTag = document.createElement('div');
-        newTableTag.classList.add('window');
-        newTableTag.id = `${elementId}-window`;
+        let newWindowTemplate = getTemplate('./templates/window.html');
 
-        setTemplate('./sublines.html', newTableTag, elementId);
+        let windowContainer = newWindowTemplate.querySelector('.window');
+        windowContainer.id = `${elementId}-window`;
+
+        let tableContainer = newWindowTemplate.querySelector('.table-content');
+        tableContainer.id = elementId;
+
         document.getElementById('windows-container').appendChild(newTableTag);
 
         // get and set data to the table
