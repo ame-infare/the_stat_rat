@@ -21,15 +21,23 @@ function setUpNavButton(button) {
 
     //close tab
     let closeTabButton = button.querySelector('.close-tab');
-    closeTabButton.addEventListener('click', function(){
-        let tableIdToClose = closeTabButton.parentNode.dataset.tab;
+    closeTabButton.addEventListener('click', function(event){
+        event.stopPropagation();
+
+        let windowIdToClose = closeTabButton.parentNode.dataset.tab;
+        let tableIdToClose = windowIdToClose.split('-')[0];
+
         allTables[tableIdToClose].table.destroy();
-        document.getElementById(tableIdToClose).remove();
+        delete allTables[tableIdToClose];
+
+        document.getElementById(windowIdToClose).remove();
         closeTabButton.parentNode.remove();
     });
 
     // change tab
-    button.addEventListener('click', function(){
+    button.addEventListener('click', function(event){
+        event.stopPropagation();
+
         if (button.classList.contains('selected')) {
             return;
         }
