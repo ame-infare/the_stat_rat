@@ -13,7 +13,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             columns: [
                 {title: "Prio", field: "prio"},
                 {title: "Booking site", field: "booking_site", headerFilter: true},
-                {title: "bs Id", field: "bs_id", headerFilter: true},
+                {title: "BS Id", field: "bs_id", headerFilter: true},
                 {
                     title: "Type", field: "type", 
                     headerFilter: true, headerFilterParams: {values: true},
@@ -168,11 +168,31 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
         }
     });
     
-    thisTable.on('dataSorted', function(sorters, rows){
+    thisTable.on('dataSorted', function(sorters, rows) {
         rows.forEach(row => {
             if (allTables[tableId].selectedRows.includes(row)) {
                 thisTable.selectRow(row);
             }
         });
+    });
+
+    //get all columns and add them as options in filter
+    thisTable.on('tableBuilt', function() {
+        let tableFilterFields = document.querySelector(`div#${tableId}-window .filter-field`);
+
+        if (tableFilterFields) {
+            let columnDefinitions = thisTable.getColumnDefinitions();
+
+            columnDefinitions.forEach(column => {
+                let option = document.createElement('option');
+    
+                option.value = column.field;
+                option.innerText = column.title;
+    
+                tableFilterFields.appendChild(option);
+            });
+
+            thisTable.off('tableBuilt');
+        }
     });
 }
