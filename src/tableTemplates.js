@@ -6,7 +6,7 @@ let allTables = {};
 function createTable(templateName, tableId, tableData, selectionsButton = null) {
     let templates = {
         stats: {
-            layout: "fitData",
+            layout: "fitDataFill",
             maxHeight: "100%",
             selectable: true,
         
@@ -33,7 +33,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
                 {title: "%tx_miss", field: "%tx_miss"},
                 {title: "%tx_limit", field: "%tx_limit"},
                 {title: "Issue date", field: "issue_date"},
-                {title: "Aff profiles", field: "affected_profiles", width: 150},
+                {title: "Aff profiles", field: "affected_profiles"},
             ]
         },
 

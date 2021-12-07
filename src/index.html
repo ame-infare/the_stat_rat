@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Stat Rat</title>
-    <link rel="stylesheet" href="../node_modules/tabulator-tables/dist/css/tabulator_site.css">
+    <link rel="stylesheet" href="../node_modules/tabulator-tables/dist/css/tabulator.min.css">
     <link rel="stylesheet" href="./index.css">
 </head>
 <body>
@@ -16,8 +16,40 @@
     <div id="windows-container">
 
         <div id="stats-window" class="active window">
-            <div>
-                <button id="load-selected-sites">Load Selected(<span id="num-selected">0</span>)</button>
+            <div class="window-buttons">
+
+                <button id="load-selected-sites">Load Selected (<span id="num-selected">0</span>)</button>
+
+                <div id="filter-button">
+
+                    <span>Filter: </span>
+                    
+                    <select id="filter-field">
+                        <option></option>
+                        <option value="name">Name</option>
+                        <option value="progress">Progress</option>
+                        <option value="gender">Gender</option>
+                        <option value="rating">Rating</option>
+                        <option value="col">Favourite Colour</option>
+                        <option value="dob">Date Of Birth</option>
+                        <option value="car">Drives</option>
+                        <option value="function">Drives & Rating < 3</option>
+                    </select>
+                    
+                    <select id="filter-type">
+                        <option value="=">=</option>
+                        <option value="<"><</option>
+                        <option value="<="><=</option>
+                        <option value=">">></option>
+                        <option value=">=">>=</option>
+                        <option value="!=">!=</option>
+                        <option value="like">like</option>
+                    </select>
+                
+                    <input id="filter-value" type="text" placeholder="value">
+                
+                    <button id="filter-add">Add</button>
+                </div>
             </div>
             
             <div id="stats"></div>
