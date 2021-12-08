@@ -13,6 +13,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+
     background-color: var(--background-color);
 }
 
@@ -27,7 +28,7 @@ body {
     text-decoration: none;
 
     padding: 14px 16px;
-    margin: 1px 1px 3px 1px;
+    margin: 1px 4px 3px 0px;
 
     cursor: pointer;
     
@@ -36,17 +37,21 @@ body {
     border-right: 1px solid var(--tab-light-color);
     border-radius: 8px 8px 0 0;
 
-    transition: 0.3s;
+    box-shadow: -1px -1px 1px var(--tab-light-color);
+
+    transition: 0.1s;
 }
 
 #nav li:hover {
     background-color: var(--hover-color);
+    box-shadow: -1px -1px 1px var(--hover-color);
 }
 
 #nav li.selected {
     background-color: var(--tab-light-color);
     color: var(--background-color);
-    margin: 4px 1px 0 1px;
+    margin: 4px 2px 0 1px;
+    box-shadow: none;
 }
 
 .close-tab {
@@ -110,7 +115,7 @@ body {
     cursor: pointer;
     border-radius: 2px;
 
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.6);
+    box-shadow: -1px -2px 2px var(--background-color);
 
     background-color: #4c4c4ce8;
 
@@ -122,16 +127,16 @@ body {
     font-size: 15px;
     text-align: center;
 
-    transition: 0.3s;
+    transition: 0.04s;
 }
 
 .window-buttons > button:hover {
     background-color: var(--hover-color);
     border-radius: 7px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+    box-shadow: -1.5px -3px 3px var(--background-color);
 }
 
 .window-buttons > button:active {
-    background-color: black;
+    background-color: var(--background-color);
     box-shadow: none;
 }
