@@ -28,7 +28,7 @@ body {
     text-decoration: none;
 
     padding: 14px 16px;
-    margin: 1px 4px 3px 0px;
+    margin: 1px 3px 3px 2px;
 
     cursor: pointer;
     
@@ -50,7 +50,7 @@ body {
 #nav li.selected {
     background-color: var(--tab-light-color);
     color: var(--background-color);
-    margin: 4px 2px 0 1px;
+    margin: 4px 5px 0 0px;
     box-shadow: none;
 }
 
