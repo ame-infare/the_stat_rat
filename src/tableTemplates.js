@@ -66,13 +66,13 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
                     title: "Travel info",
                     columns: [
                         {title: "POS", field: "pos"},
+                        {title: "Origin", field: "flight_origin"},
+                        {title: "Origin type", field: "flight_origin_type"},
                         {title: "Destination", field: "destination"},
                         {title: "Destination type", field: "destination_type"},
                         {title: "User input", field: "destination_user_input"},
                         {title: "Adults", field: "adults"},
                         {title: "Children", field: "children"},
-                        {title: "Origin", field: "flight_origin"},
-                        {title: "Origin type", field: "flight_origin_type"},
                     ]
                 },
                 {
