@@ -19,30 +19,37 @@
             
             <div class="window-buttons">
 
-                <button id="load-selected-sites">Load Selected (<span id="num-selected">0</span>)</button>
+                <button class="load-selected-sites">Load Selected (<span class="num-selected">0</span>)</button>
 
-                <div id="filter-button">
+                <div class="filter-button">
+                    <form>
+                        <span>Filter: </span>
 
-                    <span>Filter: </span>
-
-                    <select class="filter-field">
-                        <option></option>
-                    </select>
+                        <select name="columns">
+                            <option></option>
+                        </select>
+                        
+                        <select name="filterType">
+                            <option value="=">=</option>
+                            <option value="<"><</option>
+                            <option value="<="><=</option>
+                            <option value=">">></option>
+                            <option value=">=">>=</option>
+                            <option value="!=">!=</option>
+                            <option value="like">like</option>
+                        </select>
                     
-                    <select class="filter-type">
-                        <option value="=">=</option>
-                        <option value="<"><</option>
-                        <option value="<="><=</option>
-                        <option value=">">></option>
-                        <option value=">=">>=</option>
-                        <option value="!=">!=</option>
-                        <option value="like">like</option>
-                    </select>
-                
-                    <input class="filter-value" type="text" placeholder="value">
-                
-                    <button class="filter-add">Add</button>
+                        <input name="filterValue" type="text" placeholder="value">
+
+                        <input type="hidden" name="tableName" value="stats">
+
+                        <input type="submit" value="Submit">
+                    </form>
                 </div>
+            </div>
+
+            <div class="applied-filters">
+                
             </div>
             
             <div id="stats"></div>

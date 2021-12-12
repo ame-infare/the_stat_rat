@@ -1,20 +1,11 @@
-function setTemplate(link, containerElement, tableId) {
-    fetch(link)
-        .then(response => {
-            return response.text();
-        })
-        .then(template => {
-            containerElement.innerHTML = template;
-            let tableContents = containerElement.querySelector('.table-content');
-            tableContents.id = tableId;
-        });
-}
-
 async function getTemplate(path) {
     const response = await fetch(path);
     const template = await response.text();
     return document.createRange().createContextualFragment(template);
 }
+
+let navButtons = document.querySelectorAll('#nav li');
+navButtons.forEach(button => setUpNavButton(button));
 
 // nav buttons and showing selected table
 function setUpNavButton(button) {
@@ -58,6 +49,3 @@ function setUpNavButton(button) {
         selectedTable.classList.add('active');
     });
 }
-
-let navButtons = document.querySelectorAll('#nav li');
-navButtons.forEach(button => setUpNavButton(button));

@@ -11,6 +11,8 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             selectable: true,
         
             columns: [
+                //{formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                    //cell.getRow().toggleSelect();}},
                 {title: "Prio", field: "prio"},
                 {title: "Booking site", field: "booking_site", headerFilter: true},
                 {title: "BS Id", field: "bs_id", headerFilter: true},
@@ -178,7 +180,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
 
     //get all columns and add them as options in filter
     thisTable.on('tableBuilt', function() {
-        let tableFilterFields = document.querySelector(`div#${tableId}-window .filter-field`);
+        let tableFilterFields = document.querySelector(`div#${tableId}-window [name=columns]`);
 
         if (tableFilterFields) {
             let columnDefinitions = thisTable.getColumnDefinitions();
@@ -195,4 +197,46 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             thisTable.off('tableBuilt');
         }
     });
+
+    //handling filter form
+    const filterForm = document.querySelector(`#${tableId}-window .filter-button form`);
+    if (filterForm) {
+        filterForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            let columnName = event.target.elements.columns.value;
+            let filterType = event.target.elements.filterType.value;
+            let value = event.target.elements.filterValue.value;
+            let tableName = event.target.elements.tableName.value;
+
+            if (columnName && value && tableName) {
+                let newFilter = document.createElement('div');
+                newFilter.classList.add('active');
+                newFilter.addEventListener('click', (event) => {
+                    event.stopPropagation();
+
+                    newFilter.classList.contains('active') ? newFilter.classList.remove('active') : newFilter.classList.add('active');
+                });
+
+                let text = document.createElement('span');
+                text.innerText = `${columnName} ${filterType} ${value}`;
+
+                let closeButton = document.createElement('span');
+                closeButton.innerText = String.fromCodePoint(10060);
+                closeButton.classList.add('remove');
+
+                closeButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+
+                    newFilter.remove();
+                });
+
+                newFilter.appendChild(text);
+                newFilter.appendChild(closeButton);
+
+                const filterElement = document.querySelector(`#${tableId}-window .applied-filters`);
+                filterElement.appendChild(newFilter);
+            }
+        });
+    }
 }

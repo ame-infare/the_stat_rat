@@ -140,3 +140,32 @@ body {
     background-color: var(--background-color);
     box-shadow: none;
 }
+
+.applied-filters {
+    display: flex;
+    padding: 5px;
+    background-color: var(--tab-light-color);
+}
+
+.applied-filters > * {
+    border: var(--background-color) solid 2px;
+    border-radius: 15px;
+
+    padding: 2px 10px;
+    margin: 0 5px;
+
+    font-size: small;
+
+    background-color: #ff7f7f;
+
+    cursor: pointer;
+}
+
+.applied-filters > .active {
+    background-color: #ccff7f;
+}
+
+.applied-filters .remove {
+    margin: 0 0 0 0.4em;
+}
+    
