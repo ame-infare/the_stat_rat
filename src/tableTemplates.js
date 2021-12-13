@@ -3,16 +3,25 @@ const Tabulator = require('tabulator-tables');
 // an object to store all tables
 let allTables = {};
 
+const openNextIcon = function (cell, formatterParams) {
+    return String.fromCodePoint(128270);
+}
+
+const openNextPage = function(event, cell) { 
+    event.stopPropagation();
+
+    openNewWindow([cell.getRow()]);
+}
+
 function createTable(templateName, tableId, tableData, selectionsButton = null) {
     let templates = {
         stats: {
             layout: "fitDataFill",
             maxHeight: "100%",
             selectable: true,
-        
+
             columns: [
-                //{formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
-                    //cell.getRow().toggleSelect();}},
+                {formatter: openNextIcon, hozAlign:"center", headerSort:false, cellClick: openNextPage},
                 {title: "Prio", field: "prio"},
                 {title: "Booking site", field: "booking_site", headerFilter: true},
                 {title: "BS Id", field: "bs_id", headerFilter: true},
@@ -184,14 +193,23 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
 
         if (tableFilterFields) {
             let columnDefinitions = thisTable.getColumnDefinitions();
-
-            columnDefinitions.forEach(column => {
+            let addNewColumnFilter = function (column) {
                 let option = document.createElement('option');
     
                 option.value = column.field;
                 option.innerText = column.title;
     
                 tableFilterFields.appendChild(option);
+            }
+
+            columnDefinitions.forEach(column => {
+                if (column.columns) {
+                    column.columns.forEach(innerColumn => {
+                        addNewColumnFilter(innerColumn);
+                    });
+                } else {
+                    addNewColumnFilter(column);
+                }
             });
 
             thisTable.off('tableBuilt');
@@ -210,12 +228,21 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             let tableName = event.target.elements.tableName.value;
 
             if (columnName && value && tableName) {
+
+                thisTable.addFilter(columnName, filterType, value);
+
                 let newFilter = document.createElement('div');
                 newFilter.classList.add('active');
                 newFilter.addEventListener('click', (event) => {
                     event.stopPropagation();
-
-                    newFilter.classList.contains('active') ? newFilter.classList.remove('active') : newFilter.classList.add('active');
+                    
+                    if (newFilter.classList.contains('active')) {
+                        newFilter.classList.remove('active')
+                        thisTable.removeFilter(columnName, filterType, value);
+                    } else {
+                        newFilter.classList.add('active');
+                        thisTable.addFilter(columnName, filterType, value);
+                    }
                 });
 
                 let text = document.createElement('span');
@@ -228,6 +255,10 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
                 closeButton.addEventListener('click', (event) => {
                     event.stopPropagation();
 
+                    if (newFilter.classList.contains('active')) {
+                        thisTable.removeFilter(columnName, filterType, value);
+                    }
+
                     newFilter.remove();
                 });
 
@@ -239,4 +270,116 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             }
         });
     }
+}
+
+function openNewWindow(selectedRows) {
+    if (selectedRows.length > 0) {
+        let elementId = 'sublines' + ++numOfSublineTabsOpen;
+        let rowsData = Array.from(selectedRows, x => x.getData());
+
+        // deselect all selected rows
+        allTables.stats.selectedRows = [];
+        allTables.stats.table.deselectRow();
+        selectedBsButton.innerText = '0';
+        
+        // create nav bar button
+        getTemplate('./templates/tabButton.html')
+            .then(navBarTemplate => {
+                let tabButton = navBarTemplate.querySelector('li');
+                tabButton.dataset.tab = `${elementId}-window`;
+
+                let tabName = navBarTemplate.querySelector('.tab-name');
+                for (let index = 0; index < rowsData.length; index++) {
+                    if (index > 0) {
+                        tabName.innerText += ', ';
+                    }
+
+                    tabName.innerText += `${rowsData[index].booking_site} ${rowsData[index].key}`;
+                }
+
+                document.getElementById('nav').appendChild(navBarTemplate)
+                
+                setUpNavButton(document.getElementById('nav').querySelector('li:last-child'));
+            });
+
+        // create table element
+        getTemplate('./templates/window.html')
+            .then(newWindowTemplate => {
+                let windowContainer = newWindowTemplate.querySelector('.window');
+                windowContainer.id = `${elementId}-window`;
+        
+                let tableContainer = newWindowTemplate.querySelector('.table-content');
+                tableContainer.id = elementId;
+
+                let filterForm = newWindowTemplate.querySelector('.filter-button > form');
+                if (filterForm) {
+                    let inputEl = document.createElement('input');
+                    inputEl.setAttribute('type', 'hidden');
+                    inputEl.setAttribute('name', 'tableName');
+                    inputEl.setAttribute('value', elementId);
+
+                    filterForm.appendChild(inputEl);
+                }
+                
+                let selectionsButton = newWindowTemplate.querySelector('.num-selected');
+
+                document.getElementById('windows-container').appendChild(newWindowTemplate);
+
+                return selectionsButton;
+            }).then((selectionsButton) => {
+                
+                // get and set data to the table
+                let message = {
+                    action: 'sublines',
+                    data: rowsData
+                };
+
+                loadData(message).then((tableData) => {
+                    createTable('subs', elementId, tableData, selectionsButton);
+                });
+            });
+    } 
+}
+
+// nav buttons and showing selected table
+function setUpNavButton(button) {
+
+    //close tab
+    let closeTabButton = button.querySelector('.close-tab');
+    closeTabButton.addEventListener('click', function(event){
+        event.stopPropagation();
+
+        let windowIdToClose = closeTabButton.parentNode.dataset.tab;
+        let tableIdToClose = windowIdToClose.split('-')[0];
+
+        allTables[tableIdToClose].table.destroy();
+        delete allTables[tableIdToClose];
+
+        document.getElementById(windowIdToClose).remove();
+        closeTabButton.parentNode.remove();
+    });
+
+    // change tab
+    button.addEventListener('click', function(event){
+        event.stopPropagation();
+
+        if (button.classList.contains('selected')) {
+            return;
+        }
+
+        navButtons = document.querySelectorAll('#nav li');
+        navButtons.forEach(button => {
+            button.classList.remove('selected');
+        });
+
+        button.classList.add('selected');
+
+        let allTables = document.querySelectorAll('.window');
+        allTables.forEach(table => {
+            table.classList.remove('active');
+        });
+
+        let selectedTable = document.getElementById(button.dataset.tab);
+        selectedTable.classList.add('active');
+    });
 }
