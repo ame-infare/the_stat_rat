@@ -31,19 +31,42 @@ def get_query(json_message):
     if action == 'stats':
         return 'exec beclu4.Vacation_Stats.dbo.usp_vacation_booking_site_stats'
 
-    elif action == 'sublines':
+    elif action == 'subs':
         subline_data = json_message['data']
 
-        db_query = ('SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats\n'
-            'WHERE relevant > 0\nAND (')
+        db_query = """SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats
+                      WHERE relevant > 0
+                      AND ("""
 
-        for count, booking_site in enumerate(subline_data):
-            if count > 0:
+        for index, booking_site in enumerate(subline_data):
+            if index > 0:
                 db_query += 'OR '
-            db_query += (f'(booking_site_id = {booking_site["bs_id"]} '
-                         f'AND collection_type = \'{booking_site["type"]}\')\n')
+
+            db_query += f"""(booking_site_id = {booking_site["bs_id"]}
+                            AND collection_type = '{booking_site["type"]}')
+                        """
 
         db_query += ')'
+
+        return db_query
+
+    elif action == 'tx':
+        subline_data = json_message['data']
+        db_query = """
+            SELECT * FROM beclu4.[Vacation_Stats].[dbo].T_Vacations_tx_Stats 
+            WHERE max_scheduler_active_queue_id = scheduler_active_queue_id
+            AND ("""
+
+        for index, subline in enumerate(subline_data):
+            if index > 0:
+                db_query += 'OR '
+
+            db_query += f"""(run_date_utc = '{subline["run_date_utc"]}'
+                            AND subscription_line_id = {subline["subscription_line_id"]})
+                        """
+        
+        db_query += ')'
+
         return db_query
 
 def controller(test_json=None):
