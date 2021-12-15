@@ -9,58 +9,16 @@
     <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-    <ul id="nav">
-        <li class="selected" data-tab="stats-window">STATS<span class="close-tab">&#10060;</span></li>
-    </ul>
+    <ul id="nav"></ul>
 
     <div id="windows-container">
-
-        <div id="stats-window" class="active window">
-            
-            <div class="window-buttons">
-
-                <button class="load-selected-sites">Load Selected (<span class="num-selected">0</span>)</button>
-
-                <div class="filter-button">
-                    <form>
-                        <span>Filter: </span>
-
-                        <select name="columns">
-                            <option></option>
-                        </select>
-                        
-                        <select name="filterType">
-                            <option value="=">=</option>
-                            <option value="<"><</option>
-                            <option value="<="><=</option>
-                            <option value=">">></option>
-                            <option value=">=">>=</option>
-                            <option value="!=">!=</option>
-                            <option value="like">like</option>
-                            <option value="keywords">keywords</option>
-                        </select>
-                    
-                        <input name="filterValue" type="text" placeholder="value">
-
-                        <input type="hidden" name="tableName" value="stats">
-
-                        <input type="submit" value="Submit">
-                    </form>
-                </div>
-            </div>
-
-            <div class="applied-filters"></div>
-            
-            <div id="stats"></div>
-        </div>
 
         <div id="separator"></div>
 
     </div>
 
+    <script src="./loadTableData.js"></script>
     <script src="./tableTemplates.js"></script>
     <script src="./index.js"></script>
-    <script src="./loadTableData.js"></script>
-    <script src="./stats.js"></script>
 </body>
 </html>

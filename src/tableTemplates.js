@@ -3,6 +3,11 @@ const Tabulator = require('tabulator-tables');
 // an object to store all tables
 let allTables = {};
 
+// Initial Stats Load
+loadData({action: 'stats'}).then((tableData) => {
+    openNewTab([], 'stats');
+});
+
 const openNextIcon = function (cell, tabName) {
     let nextPageIcon = document.createElement('span');
 
@@ -311,9 +316,9 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
 
 let numOfTabsOpen = 0;
 async function openNewTab(selectedRows, windowName) {
-    if (selectedRows.length > 0) {
+    if (selectedRows.length > 0 || windowName === 'stats') {
         let elementId = windowName + ++numOfTabsOpen;
-        let rowsData = Array.from(selectedRows, x => x.getData());
+        let rowsData = selectedRows.length > 0 ? Array.from(selectedRows, x => x.getData()) : null;
       
         // create nav bar button
         let navBarTemplate = await getTemplate('./templates/tabButton.html');
@@ -326,14 +331,20 @@ async function openNewTab(selectedRows, windowName) {
             subs: ['booking_site', 'key'],
             tx: ['subscription_line_id', 'key']
         };
-        for (let index = 0; index < rowsData.length; index++) {
-            if (index > 0) {
-                tabName.innerText += ', ';
+
+        if (rowsData !== null) {
+
+            for (let index = 0; index < rowsData.length; index++) {
+                if (index > 0) {
+                    tabName.innerText += ', ';
+                }
+    
+                tabName.innerText += `${rowsData[index][tabNameDataKeys[windowName][0]]} ${rowsData[index][tabNameDataKeys[windowName][1]]}`;
             }
-
-            tabName.innerText += `${rowsData[index][tabNameDataKeys[windowName][0]]} ${rowsData[index][tabNameDataKeys[windowName][1]]}`;
+        } else {
+            tabName.innerText = 'STATS';
         }
-
+        
         document.getElementById('nav').appendChild(navBarTemplate)
        
         setUpNavButton(document.getElementById('nav').querySelector('li:last-child'));
@@ -357,9 +368,34 @@ async function openNewTab(selectedRows, windowName) {
             filterForm.appendChild(inputEl);
         }
         
-        let selectionsButton = newWindowTemplate.querySelector('.num-selected');
+        // Setting up Load Selected Button
+        const loadSelectedButton = newWindowTemplate.querySelector('.load-selected');
+        const numOfSelectedRowsDial = newWindowTemplate.querySelector('.num-selected');
+        if (loadSelectedButton) {
+            let tabLoadNextPageName = {
+                stats: 'subs',
+                subs: 'tx'
+            };
+    
+            loadSelectedButton.addEventListener('click', function(event){
+                event.stopPropagation();
+    
+                let selectedRows = allTables[elementId].selectedRows;
+    
+                // deselect all selected rows
+                allTables[elementId].selectedRows = [];
+                allTables[elementId].table.deselectRow();
+                numOfSelectedRowsDial.innerText = '0';
+    
+                openNewTab(selectedRows, tabLoadNextPageName[windowName]);
+            });
+        }
 
+        // add new window to main html page and click to open the tab
         document.getElementById('windows-container').appendChild(newWindowTemplate);
+        if (windowName === 'stats') {
+            document.getElementById('nav').querySelector('li:last-child').click();
+        }
                 
         // get and set data to the table
         let message = {
@@ -368,7 +404,7 @@ async function openNewTab(selectedRows, windowName) {
         };
 
         loadData(message).then((tableData) => {
-            createTable(windowName, elementId, tableData, selectionsButton);
+            createTable(windowName, elementId, tableData, numOfSelectedRowsDial);
         });
     } 
 }
