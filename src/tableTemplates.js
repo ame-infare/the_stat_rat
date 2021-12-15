@@ -257,61 +257,6 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
             thisTable.off('tableBuilt');
         }
     });
-
-    //handling filter form
-    const filterForm = document.querySelector(`#${tableId}-window .filter-button form`);
-    if (filterForm) {
-        filterForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            let columnName = event.target.elements.columns.value;
-            let filterType = event.target.elements.filterType.value;
-            let value = event.target.elements.filterValue.value;
-            let tableName = event.target.elements.tableName.value;
-
-            if (columnName && value && tableName) {
-
-                thisTable.addFilter(columnName, filterType, value);
-
-                let newFilter = document.createElement('div');
-                newFilter.classList.add('active');
-                newFilter.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    
-                    if (newFilter.classList.contains('active')) {
-                        newFilter.classList.remove('active')
-                        thisTable.removeFilter(columnName, filterType, value);
-                    } else {
-                        newFilter.classList.add('active');
-                        thisTable.addFilter(columnName, filterType, value);
-                    }
-                });
-
-                let text = document.createElement('span');
-                text.innerText = `${columnName} ${filterType} ${value}`;
-
-                let closeButton = document.createElement('span');
-                closeButton.innerText = String.fromCodePoint(10060);
-                closeButton.classList.add('remove');
-
-                closeButton.addEventListener('click', (event) => {
-                    event.stopPropagation();
-
-                    if (newFilter.classList.contains('active')) {
-                        thisTable.removeFilter(columnName, filterType, value);
-                    }
-
-                    newFilter.remove();
-                });
-
-                newFilter.appendChild(text);
-                newFilter.appendChild(closeButton);
-
-                const filterElement = document.querySelector(`#${tableId}-window .applied-filters`);
-                filterElement.appendChild(newFilter);
-            }
-        });
-    }
 }
 
 let numOfTabsOpen = 0;
@@ -357,16 +302,6 @@ async function openNewTab(selectedRows, windowName) {
 
         let tableContainer = newWindowTemplate.querySelector('.table-content');
         tableContainer.id = elementId;
-
-        let filterForm = newWindowTemplate.querySelector('.filter-button > form');
-        if (filterForm) {
-            let inputEl = document.createElement('input');
-            inputEl.setAttribute('type', 'hidden');
-            inputEl.setAttribute('name', 'tableName');
-            inputEl.setAttribute('value', elementId);
-
-            filterForm.appendChild(inputEl);
-        }
         
         // Setting up Load Selected Button
         const loadSelectedButton = newWindowTemplate.querySelector('.load-selected');
@@ -388,6 +323,70 @@ async function openNewTab(selectedRows, windowName) {
                 numOfSelectedRowsDial.innerText = '0';
     
                 openNewTab(selectedRows, tabLoadNextPageName[windowName]);
+            });
+        }
+
+        //handling filter form button
+        const filterForm = newWindowTemplate.querySelector('.filter-button form');
+        if (filterForm) {
+
+            //create hidden input element with table name in filter form
+            let inputEl = document.createElement('input');
+            inputEl.setAttribute('type', 'hidden');
+            inputEl.setAttribute('name', 'tableName');
+            inputEl.setAttribute('value', elementId);
+            filterForm.appendChild(inputEl);
+
+            // filter button functionality
+            filterForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                let columnName = event.target.elements.columns.value;
+                let filterType = event.target.elements.filterType.value;
+                let value = event.target.elements.filterValue.value;
+                let tableName = event.target.elements.tableName.value;
+
+                if (columnName && value && tableName) {
+
+                    allTables[elementId].table.addFilter(columnName, filterType, value);
+
+                    let newFilter = document.createElement('div');
+                    newFilter.classList.add('active');
+                    newFilter.addEventListener('click', (event) => {
+                        event.stopPropagation();
+                        
+                        if (newFilter.classList.contains('active')) {
+                            newFilter.classList.remove('active')
+                            allTables[elementId].table.removeFilter(columnName, filterType, value);
+                        } else {
+                            newFilter.classList.add('active');
+                            allTables[elementId].table.addFilter(columnName, filterType, value);
+                        }
+                    });
+
+                    let text = document.createElement('span');
+                    text.innerText = `${columnName} ${filterType} ${value}`;
+
+                    let closeButton = document.createElement('span');
+                    closeButton.innerText = String.fromCodePoint(10060);
+                    closeButton.classList.add('remove');
+
+                    closeButton.addEventListener('click', (event) => {
+                        event.stopPropagation();
+
+                        if (newFilter.classList.contains('active')) {
+                            allTables[elementId].table.removeFilter(columnName, filterType, value);
+                        }
+
+                        newFilter.remove();
+                    });
+
+                    newFilter.appendChild(text);
+                    newFilter.appendChild(closeButton);
+
+                    const filterElement = document.querySelector(`#${elementId}-window .applied-filters`);
+                    filterElement.appendChild(newFilter);
+                }
             });
         }
 
