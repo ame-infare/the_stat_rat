@@ -27,18 +27,18 @@ def send_to_electron(table_data):
 
 def get_query(json_message):
     action = json_message['action']
+    data = json_message['data']
+    db_query = ''
 
     if action == 'stats':
-        return 'exec beclu4.Vacation_Stats.dbo.usp_vacation_booking_site_stats'
+        db_query = 'exec beclu4.Vacation_Stats.dbo.usp_vacation_booking_site_stats'
 
     elif action == 'subs':
-        subline_data = json_message['data']
-
         db_query = """SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats
                       WHERE relevant > 0
                       AND ("""
 
-        for index, booking_site in enumerate(subline_data):
+        for index, booking_site in enumerate(data):
             if index > 0:
                 db_query += 'OR '
 
@@ -48,16 +48,13 @@ def get_query(json_message):
 
         db_query += ')'
 
-        return db_query
-
     elif action == 'tx':
-        subline_data = json_message['data']
         db_query = """
             SELECT * FROM beclu4.[Vacation_Stats].[dbo].T_Vacations_tx_Stats 
             WHERE max_scheduler_active_queue_id = scheduler_active_queue_id
             AND ("""
 
-        for index, subline in enumerate(subline_data):
+        for index, subline in enumerate(data):
             if index > 0:
                 db_query += 'OR '
 
@@ -67,7 +64,25 @@ def get_query(json_message):
         
         db_query += ')'
 
-        return db_query
+    elif action == 'hotels':
+        db_query = f"""
+            DECLARE @hotel_group_id int = {data[0]["hotel_group_id"]}
+            SELECT hmd.*, sh.hotel_group_id, shim.SupplierId
+            FROM becluster.vacation.dbo.hotelMasterData hmd
+            LEFT JOIN
+                (SELECT * 
+                FROM becluster.vacation.dbo.t_specified_hotels
+                WHERE hotel_group_id = @hotel_group_id) sh 
+                ON sh.infare_hotel_id = hmd.InfareHotelId
+            LEFT JOIN
+                (SELECT *
+                FROM becluster.vacation.dbo.supplierHotelIdMapping) shim 
+                ON shim.InfareHotelId = hmd.InfareHotelId
+            WHERE sh.infare_hotel_id IS NOT null
+            ORDER BY Name
+        """
+
+    return db_query
 
 def controller(test_json=None):
     json_message = get_message() if not test_json else json.loads(test_json)

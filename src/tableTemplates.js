@@ -3,21 +3,44 @@ const Tabulator = require('tabulator-tables');
 // an object to store all tables
 let allTables = {};
 
+let numOfTabsOpen = 0;
+
+async function getTemplate(path) {
+    const response = await fetch(path);
+    const template = await response.text();
+    return document.createRange().createContextualFragment(template);
+}
+
 // Initial Stats Load
-loadData({action: 'stats'}).then((tableData) => {
-    openNewTab([], 'stats');
-});
+openNewTab([], 'stats');
 
-const openNextIcon = function (cell, tabName) {
+function openNextIcon(cell, tabName) {
     let nextPageIcon = document.createElement('span');
-
     nextPageIcon.innerText = String.fromCodePoint(128270);
+
     nextPageIcon.addEventListener('click', (event) => {
         event.stopPropagation();
         openNewTab([cell.getRow()], tabName);
     });
 
-    return nextPageIcon
+    return nextPageIcon;
+}
+
+function hotelsIcon(cell) {
+    let rowData = cell.getData();
+    if (rowData['hotel_group_id']) {
+        let hotelsIcon = document.createElement('span');
+        hotelsIcon.innerText = String.fromCodePoint(9962);
+    
+        hotelsIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openNewTab([cell.getRow()], 'hotels');
+        });
+        
+        return hotelsIcon;
+    }
+
+    return null;
 }
 
 function createTable(templateName, tableId, tableData, selectionsButton = null) {
@@ -35,8 +58,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
                 {title: "BS Id", field: "bs_id", headerFilter: true},
                 {
                     title: "Type", field: "type", 
-                    headerFilter: true, headerFilterParams: {values: true},
-                    headerFilterFunc : "="
+                    headerFilter: true, headerFilterFunc : "="
                 },
                 {title: "Code", field: "code"},
                 {title: "Filter id", field: "filter_id"},
@@ -64,6 +86,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
         
             columns:[
                 {formatter: openNextIcon, formatterParams: () => {return 'tx'}, hozAlign:"center", headerSort:false},
+                {formatter: hotelsIcon, hozAlign:"center", headerSort:false},
                 {title: "key", field: "key", headerFilter: true},
                 {title: "Subline", field: "subscription_line_id", headerFilter: true},
                 {title: "Last Run", field: "run_date_utc", headerFilter: true},
@@ -155,6 +178,37 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
                     ]
                 },
             ],
+        },
+
+        hotels: {
+            data: tableData,
+            layout: "fitDataFill",
+            maxHeight: "100%",
+            selectable: true,
+
+            columns: [
+                {title: "Hotel Group", field: "hotel_group_id"},
+                {title: "Supplier Id", field: "SupplierId"},
+                {title: "Supplier Hotel Id", field: "SupplierHotelId"},
+                {title: "Infare Hotel Id", field: "InfareHotelId"},
+                {title: "Infare Name Key", field: "InfareNameKey"},
+                {title: "Name", field: "Name"},
+                {title: "Chain Name", field: "ChainName"},
+                {title: "Associated Location Code", field: "AssociatedLocationCode"},
+                {title: "Location Type Code", field: "LocationTypeCode"},
+                {title: "Address", field: "Address"},
+                {title: "Street1", field: "Street1"},
+                {title: "Street2", field: "Street2"},
+                {title: "City", field: "City"},
+                {title: "Region", field: "Region"},
+                {title: "Postcode", field: "Postcode"},
+                {title: "Country", field: "Country"},
+                {title: "Latitude", field: "Latitude"},
+                {title: "Longitude", field: "Longitude"},
+                {title: "Star Rating", field: "StarRating"},
+                {title: "Data Supplier", field: "DataSupplier"},
+                {title: "Legacy Name", field: "LegacyName"}
+            ]
         },
 
         tx: {
@@ -259,12 +313,11 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
     });
 }
 
-let numOfTabsOpen = 0;
 async function openNewTab(selectedRows, windowName) {
     if (selectedRows.length > 0 || windowName === 'stats') {
         let elementId = windowName + ++numOfTabsOpen;
         let rowsData = selectedRows.length > 0 ? Array.from(selectedRows, x => x.getData()) : null;
-      
+
         // create nav bar button
         let navBarTemplate = await getTemplate('./templates/tabButton.html');
 
@@ -274,7 +327,8 @@ async function openNewTab(selectedRows, windowName) {
         let tabName = navBarTemplate.querySelector('.tab-name');
         let tabNameDataKeys = {
             subs: ['booking_site', 'key'],
-            tx: ['subscription_line_id', 'key']
+            tx: ['subscription_line_id', 'key'],
+            hotels: ['hotel_group_id', 'subscription_line_id']
         };
 
         if (rowsData !== null) {
