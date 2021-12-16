@@ -188,7 +188,7 @@ function createTable(templateName, tableId, tableData, selectionsButton = null) 
 
             columns: [
                 {title: "Hotel Group", field: "hotel_group_id"},
-                {title: "Supplier Id", field: "SupplierId"},
+                {title: "Supplier Id", field: "SupplierId", headerFilter: true},
                 {title: "Supplier Hotel Id", field: "SupplierHotelId"},
                 {title: "Infare Hotel Id", field: "InfareHotelId"},
                 {title: "Infare Name Key", field: "InfareNameKey"},
