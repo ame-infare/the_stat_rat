@@ -1,6 +1,6 @@
 const Tabulator = require('tabulator-tables');
 
-// an object to store all tables
+// an object to store all instantiated tables
 let allTables = {};
 
 let numOfTabsOpen = 0;
@@ -15,6 +15,16 @@ async function getTemplate(path) {
 openNewTab([], 'stats');
 
 function openNextIcon(cell, tabName) {
+
+    // transactions are only available 7 days after the end time
+    if (tabName === 'tx') {
+        const rowData = cell.getData();
+        let txEndTime = new Date(rowData['end_run_datetime_utc']);
+        if (new Date() - txEndTime >= 604800000) {
+            return null;
+        }
+    }
+
     let nextPageIcon = document.createElement('span');
     nextPageIcon.innerText = String.fromCodePoint(128270);
 
