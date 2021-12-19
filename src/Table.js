@@ -1,52 +1,66 @@
-const Tabulator = require('tabulator-tables');
-
-// an object to store all instantiated tables
-let allTables = {};
-
-let numOfTabsOpen = 0;
-
-async function getTemplate(path) {
-    const response = await fetch(path);
-    const template = await response.text();
-    return document.createRange().createContextualFragment(template);
-}
-
-// Initial Stats Load
-openNewTab([], 'stats');
+const { PythonShell } = require('python-shell');
 
 class Table {
-    constructor(type, tableId, selectedData, selectionsButton = null) {
+    constructor(type, tableId) {
         this.type = type;
         this.tableId = tableId;
-        this.selectionsButton = selectionsButton;
+
         this.selectedRows = [];
+        this.table;
 
-        this.tableTemplate = this.setTemplate();
-        this.getAndSetDataToTableTemplate(selectedData);
+        this.numOfSelectedRowsDial;
+    }
 
-        this.table = new Tabulator(`#${tableId}`, this.tableTemplate)
+    clearSelections() {
+        this.selectedRows = [];
+        this.table.deselectRow();
+        this.numOfSelectedRowsDial.innerText = '0';
+    }
+
+    async createTable(dataToSend) {
+        let tableTemplate = this.getTableTemplate();
+
+        let tableData = await this.getDataFromDb(dataToSend);
+
+        tableTemplate.data = tableData;
+        
+        this.table = new Tabulator(`#${this.tableId}`, tableTemplate);
 
         this.addColumnsAsOptionsForFilterButton();
         this.setupRowSelection();
     }
 
-    getAndSetDataToTableTemplate(selectedData) {
+    async getDataFromDb(dataToSend) {
         let message = {
-            action: self.type,
-            data: selectedData
+            action: this.type,
+            data: dataToSend
+        };
+        
+        let options = {
+            mode: 'json',
+            pythonPath: 'python',
+            pythonOptions: ['-u'],
+            scriptPath: './db_queries/',
+            args: [JSON.stringify(message)]
         };
 
-        loadData(message).then((tableData) => {
-            this.tableTemplate.data = tableData;
+        return new Promise(resolve => {
+            PythonShell.run('controller.py', options, function (err, results) {
+                if (err) throw err;
+                resolve(results[0]);
+            });
         });
     }
 
-    addColumnsAsOptionsForFilterButton () {
+    addColumnsAsOptionsForFilterButton() {
+        let tableId = this.tableId;
+
         this.table.on('tableBuilt', function() {
-            let tableFilterFields = document.querySelector(`div#${this.tableId}-window [name=columns]`);
+            let tableFilterFields = document.querySelector(`div#${tableId}-window [name=columns]`);
 
             if (tableFilterFields) {
-                let columnDefinitions = this.table.getColumnDefinitions();
+                let columnDefinitions = this.getColumnDefinitions();
+
                 function addNewColumnFilter(column) {
                     let option = document.createElement('option');
 
@@ -57,6 +71,10 @@ class Table {
                 }
 
                 columnDefinitions.forEach(column => {
+                    if (!column.title) {
+                        return;
+                    }
+
                     if (column.columns) {
                         column.columns.forEach(innerColumn => {
                             addNewColumnFilter(innerColumn);
@@ -66,37 +84,45 @@ class Table {
                     }
                 });
 
-                this.table.off('tableBuilt');
+                this.off('tableBuilt');
             }
         });
     }
 
-    setupRowSelection () {
+    setupRowSelection() {
         this.table.on('rowSelected', function(row) {
-            if (!this.selectedRows.includes(row)) {
-                this.selectedRows.push(row);
+            let selectedRows = allTables[this.element.id].selectedRows;
+            let numOfSelectedRowsDial = allTables[this.element.id].numOfSelectedRowsDial;
+
+            if (!selectedRows.includes(row)) {
+                selectedRows.push(row);
             }
         
-            if (this.selectionsButton) {
-                this.selectionsButton.innerText = this.selectedRows.length;
+            if (numOfSelectedRowsDial) {
+                numOfSelectedRowsDial.innerText = selectedRows.length;
             }
         });
         
         this.table.on('rowDeselected', function(row) {
-            const index = this.selectedRows.indexOf(row);
+            let selectedRows = allTables[this.element.id].selectedRows;
+            let numOfSelectedRowsDial = allTables[this.element.id].numOfSelectedRowsDial;
+
+            const index = selectedRows.indexOf(row);
             if (index > -1) {
-                this.selectedRows.splice(index, 1);
+                selectedRows.splice(index, 1);
             }
         
-            if (selectionsButton) {
-                selectionsButton.innerText = this.selectedRows.length;
+            if (numOfSelectedRowsDial) {
+                numOfSelectedRowsDial.innerText = selectedRows.length;
             }
         });
         
         this.table.on('dataSorted', function(sorters, rows) {
+            let selectedRows = allTables[this.element.id].selectedRows;
+
             rows.forEach(row => {
-                if (this.selectedRows.includes(row)) {
-                    this.table.selectRow(row);
+                if (selectedRows.includes(row)) {
+                    this.selectRow(row);
                 }
             });
         });
@@ -141,7 +167,31 @@ class Table {
         return null;
     }
 
-    setTemplate() {
+    getTableOptions(option) {
+        let options = {
+            stats: {
+                loadSelectedNextPageName: 'subs',
+                buttons: ['load-selected', 'filter-button']
+            },
+            subs: {
+                tabNameDataKeys: ['booking_site', 'key'],
+                loadSelectedNextPageName: 'tx',
+                buttons: ['load-selected', 'filter-button']
+            },
+            tx: {
+                tabNameDataKeys: ['subscription_line_id', 'key'],
+                buttons: ['filter-button']
+            },
+            hotels: {
+                tabNameDataKeys: ['hotel_group_id', 'subscription_line_id'],
+                buttons: ['filter-button']
+            }
+        }
+
+        return options[this.type][option];
+    }
+
+    getTableTemplate() {
         let templates = {
             default: {
                 layout: "fitDataFill",
@@ -332,188 +382,4 @@ class Table {
         
         return Object.assign(templates.default, templates[this.type]);
     }
-}
-
-async function openNewTab(selectedRows, windowName) {
-    if (selectedRows.length > 0 || windowName === 'stats') {
-        let elementId = windowName + ++numOfTabsOpen;
-        let rowsData = selectedRows.length > 0 ? Array.from(selectedRows, x => x.getData()) : null;
-
-        // create nav bar button
-        let navBarTemplate = await getTemplate('./templates/tabButton.html');
-
-        let navBarButton = navBarTemplate.querySelector('li');
-        navBarButton.dataset.tab = `${elementId}-window`;
-
-        let tabName = navBarTemplate.querySelector('.tab-name');
-        let tabNameDataKeys = {
-            subs: ['booking_site', 'key'],
-            tx: ['subscription_line_id', 'key'],
-            hotels: ['hotel_group_id', 'subscription_line_id']
-        };
-
-        if (rowsData !== null) {
-
-            for (let index = 0; index < rowsData.length; index++) {
-                if (index > 0) {
-                    tabName.innerText += ', ';
-                }
-    
-                tabName.innerText += `${rowsData[index][tabNameDataKeys[windowName][0]]} ${rowsData[index][tabNameDataKeys[windowName][1]]}`;
-            }
-        } else {
-            tabName.innerText = 'STATS';
-        }
-        
-        document.getElementById('nav').appendChild(navBarTemplate)
-       
-        setUpNavButton(document.getElementById('nav').querySelector('li:last-child'));
-
-        // create window
-        let newWindowTemplate = await getTemplate('./templates/window.html');
-
-        let windowContainer = newWindowTemplate.querySelector('.window');
-        windowContainer.id = `${elementId}-window`;
-
-        let tableContainer = newWindowTemplate.querySelector('.table-content');
-        tableContainer.id = elementId;
-        
-        // Setting up Load Selected Button
-        const loadSelectedButton = newWindowTemplate.querySelector('.load-selected');
-        const numOfSelectedRowsDial = newWindowTemplate.querySelector('.num-selected');
-        if (loadSelectedButton) {
-            let tabLoadNextPageName = {
-                stats: 'subs',
-                subs: 'tx'
-            };
-    
-            loadSelectedButton.addEventListener('click', function(event){
-                event.stopPropagation();
-    
-                let selectedRows = allTables[elementId].selectedRows;
-    
-                // deselect all selected rows
-                allTables[elementId].selectedRows = [];
-                allTables[elementId].table.deselectRow();
-                numOfSelectedRowsDial.innerText = '0';
-    
-                openNewTab(selectedRows, tabLoadNextPageName[windowName]);
-            });
-        }
-
-        //handling filter form button
-        const filterForm = newWindowTemplate.querySelector('.filter-button form');
-        if (filterForm) {
-
-            //create hidden input element with table name in filter form
-            let inputEl = document.createElement('input');
-            inputEl.setAttribute('type', 'hidden');
-            inputEl.setAttribute('name', 'tableName');
-            inputEl.setAttribute('value', elementId);
-            filterForm.appendChild(inputEl);
-
-            // filter button functionality
-            filterForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                let columnName = event.target.elements.columns.value;
-                let filterType = event.target.elements.filterType.value;
-                let value = event.target.elements.filterValue.value;
-                let tableName = event.target.elements.tableName.value;
-
-                if (columnName && value && tableName) {
-
-                    allTables[elementId].table.addFilter(columnName, filterType, value);
-
-                    let newFilter = document.createElement('div');
-                    newFilter.classList.add('active');
-                    newFilter.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        
-                        if (newFilter.classList.contains('active')) {
-                            newFilter.classList.remove('active')
-                            allTables[elementId].table.removeFilter(columnName, filterType, value);
-                        } else {
-                            newFilter.classList.add('active');
-                            allTables[elementId].table.addFilter(columnName, filterType, value);
-                        }
-                    });
-
-                    let text = document.createElement('span');
-                    text.innerText = `${columnName} ${filterType} ${value}`;
-
-                    let closeButton = document.createElement('span');
-                    closeButton.innerText = String.fromCodePoint(10060);
-                    closeButton.classList.add('remove');
-
-                    closeButton.addEventListener('click', (event) => {
-                        event.stopPropagation();
-
-                        if (newFilter.classList.contains('active')) {
-                            allTables[elementId].table.removeFilter(columnName, filterType, value);
-                        }
-
-                        newFilter.remove();
-                    });
-
-                    newFilter.appendChild(text);
-                    newFilter.appendChild(closeButton);
-
-                    const filterElement = document.querySelector(`#${elementId}-window .applied-filters`);
-                    filterElement.appendChild(newFilter);
-                }
-            });
-        }
-
-        // add new window to main html page and click to open the tab
-        document.getElementById('windows-container').appendChild(newWindowTemplate);
-        if (windowName === 'stats') {
-            document.getElementById('nav').querySelector('li:last-child').click();
-        }
-
-        allTables[elementId] = new Table(windowName, elementId, rowsData, numOfSelectedRowsDial)
-    }
-}
-
-// nav buttons and showing selected table
-function setUpNavButton(button) {
-
-    //close tab
-    let closeTabButton = button.querySelector('.close-tab');
-    closeTabButton.addEventListener('click', function(event){
-        event.stopPropagation();
-
-        let windowIdToClose = closeTabButton.parentNode.dataset.tab;
-        let tableIdToClose = windowIdToClose.split('-')[0];
-
-        allTables[tableIdToClose].table.destroy();
-        delete allTables[tableIdToClose];
-
-        document.getElementById(windowIdToClose).remove();
-        closeTabButton.parentNode.remove();
-    });
-
-    // change tab
-    button.addEventListener('click', function(event){
-        event.stopPropagation();
-
-        if (button.classList.contains('selected')) {
-            return;
-        }
-
-        navButtons = document.querySelectorAll('#nav li');
-        navButtons.forEach(button => {
-            button.classList.remove('selected');
-        });
-
-        button.classList.add('selected');
-
-        let allTables = document.querySelectorAll('.window');
-        allTables.forEach(table => {
-            table.classList.remove('active');
-        });
-
-        let selectedTable = document.getElementById(button.dataset.tab);
-        selectedTable.classList.add('active');
-    });
 }
