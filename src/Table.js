@@ -128,6 +128,81 @@ class Table {
         });
     }
 
+    expandRow(cell) {
+        let expandIcon = document.createElement('span');
+        expandIcon.classList.add('icon', 'active');
+        expandIcon.innerText = String.fromCodePoint(10133);
+
+        function toggleIcons(icons) {
+            icons.forEach(icon => {
+                icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
+            });
+        }
+    
+        expandIcon.addEventListener('click', event => {
+            event.stopPropagation();
+
+            toggleIcons(expandIcon.parentNode.querySelectorAll('.icon'));
+
+            let rowData = cell.getRow().getData();
+            let columns = cell.getTable().getColumnDefinitions();
+
+            let dataContainer = cell.getRow().getElement().querySelector('.data-container');
+            dataContainer.classList.add('active');
+            
+            if (!dataContainer.innerText) {
+                for (const column of columns) {
+                    if (column.columns) {
+                        let columnGroup = document.createElement('ul');
+                        columnGroup.classList.add('column-group');
+
+                        let groupName = document.createElement('h3');
+                        groupName.innerText = column.title;
+                        columnGroup.appendChild(groupName);
+
+                        for (const innerColumn of column.columns) {
+                            let columnDataContainer = document.createElement('li');
+                            columnDataContainer.classList.add('column-data');
+    
+                            columnDataContainer.innerText = `${innerColumn.field}: ${rowData[innerColumn.field]}`;
+    
+                            columnGroup.appendChild(columnDataContainer);
+                        }
+    
+                        dataContainer.appendChild(columnGroup);
+                    }
+                }
+            }    
+        });
+
+        let closeIcon = document.createElement('span');
+        closeIcon.classList.add('icon');
+        closeIcon.innerText = String.fromCodePoint(10134);
+
+        closeIcon.addEventListener('click', event => {
+            event.stopPropagation();
+
+            toggleIcons(closeIcon.parentNode.querySelectorAll('.icon'));
+
+            let dataContainer = cell.getRow().getElement().querySelector('.data-container');
+            dataContainer.classList.remove('active');
+        });
+        
+        let iconContainer = document.createElement('div');
+        iconContainer.appendChild(expandIcon);
+        iconContainer.appendChild(closeIcon);
+
+        return iconContainer;
+    }
+
+    expandableRow(row) {
+        let rowElement = row.getElement();
+
+        let expandableDataContainer = document.createElement('div');
+        expandableDataContainer.classList.add('data-container');
+        rowElement.appendChild(expandableDataContainer);
+    }
+
     openNextIcon(cell, tabName) {
 
         // transactions are only available 7 days after the end time
@@ -193,10 +268,12 @@ class Table {
 
     getTableTemplate() {
         let templates = {
+
             default: {
                 layout: "fitDataFill",
-                maxHeight: "100%",
+                height: "100%",
                 selectable: true,
+                scrollToRowIfVisible: true, //otherwise expandable rows are buggy when scrolling
             },
 
             stats: {   
@@ -228,10 +305,12 @@ class Table {
             },
     
             subs: {
+                rowFormatter: this.expandableRow,
+
                 columns:[
+                    {formatter: this.expandRow, hozAlign:"center", headerSort:false},
                     {formatter: this.openNextIcon, formatterParams: () => {return 'tx'}, hozAlign:"center", headerSort:false},
                     {formatter: this.hotelsIcon, hozAlign:"center", headerSort:false},
-                    {title: "key", field: "key", headerFilter: true},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},

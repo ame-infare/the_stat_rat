@@ -168,4 +168,44 @@ body {
 .applied-filters .remove {
     margin: 0 0 0 0.4em;
 }
-    
+
+/* EXPANDABLE ROWS */
+.icon {
+    display: none;
+}
+.icon.active {
+    display: block;
+}
+
+.data-container {
+    position: relative;
+    max-height: 0px;
+    display: none;
+
+    transition: 5s;
+}
+.data-container.active {
+    position: relative;
+
+    max-height: fit-content;
+    display: flex;
+
+    border-top: dashed 1px black;
+    border-bottom: dashed 1px black;
+}
+.column-group {
+    list-style-type: none;
+
+    padding: 0.7em;
+    margin: 1em;
+
+    border: black solid 1px;
+    border-radius: 10px;
+}
+.column-group > li {
+    margin: 0.3em;
+    letter-spacing: 0.03em;
+}
+.column-group > h3 {
+    text-align: center;
+}
