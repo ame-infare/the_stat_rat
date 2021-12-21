@@ -132,7 +132,7 @@ class Table {
         let expandIcon = document.createElement('span');
         expandIcon.classList.add('icon', 'active');
         expandIcon.innerText = String.fromCodePoint(10133);
-
+       
         function toggleIcons(icons) {
             icons.forEach(icon => {
                 icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
@@ -242,6 +242,44 @@ class Table {
         return null;
     }
 
+    addNote(cell) {
+        let addNote = document.createElement('span');
+        addNote.classList.add('icon', 'active');
+        addNote.innerText = String.fromCodePoint(9997);
+
+        let notBookable = document.createElement('span');
+        notBookable.classList.add('icon');
+        notBookable.innerText = String.fromCodePoint(128277);
+                
+        let iconContainer = document.createElement('div');
+        iconContainer.appendChild(addNote);
+        iconContainer.appendChild(notBookable);
+               
+        function toggleIcons(icons) {
+            icons.forEach(icon => {
+                icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
+            });
+        }
+        
+        function addNoteFunctionality(event, cell, toggleIcons) {
+            event.stopPropagation();
+            //get note that exists
+
+            //create form with submit and cancel buttons
+            //subline number and long note field
+
+            //display form
+
+            //if note then toggle
+            toggleIcons(addNote.parentNode.querySelectorAll('.icon'));
+        }
+    
+        addNote.addEventListener('click', (event) => {addNoteFunctionality(event, cell, toggleIcons)});
+        notBookable.addEventListener('click', (event) => {addNoteFunctionality(event, cell, toggleIcons)});
+
+        return iconContainer;
+    }
+
     getTableOptions(option) {
         let options = {
             stats: {
@@ -311,6 +349,7 @@ class Table {
                     {formatter: this.expandRow, hozAlign:"center", headerSort:false},
                     {formatter: this.openNextIcon, formatterParams: () => {return 'tx'}, hozAlign:"center", headerSort:false},
                     {formatter: this.hotelsIcon, hozAlign:"center", headerSort:false},
+                    {title: "add Note", formatter: this.addNote, hozAlign:"center", headerSort:false},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},
