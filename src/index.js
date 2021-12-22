@@ -5,12 +5,6 @@ let allTables = {};
 
 let numOfTabsOpen = 0;
 
-async function getHTMLTemplate(path) {
-    const response = await fetch(path);
-    const template = await response.text();
-    return document.createRange().createContextualFragment(template);
-}
-
 async function openNewTab(selectedRows, windowName) {
     if (selectedRows.length > 0 || windowName === 'stats') {
         let elementId = windowName + ++numOfTabsOpen;

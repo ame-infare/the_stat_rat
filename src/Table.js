@@ -1,5 +1,11 @@
 const { PythonShell } = require('python-shell');
 
+async function getHTMLTemplate(path) {
+    const response = await fetch(path);
+    const template = await response.text();
+    return document.createRange().createContextualFragment(template);
+}
+
 class Table {
     constructor(type, tableId) {
         this.type = type;
@@ -88,6 +94,12 @@ class Table {
             }
         });
     }
+              
+    toggleIcons(icons) {
+        icons.forEach(icon => {
+            icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
+        });
+    }
 
     setupRowSelection() {
         this.table.on('rowSelected', function(row) {
@@ -128,21 +140,15 @@ class Table {
         });
     }
 
-    expandRow(cell) {
+    expandRow(cell, tableObj) {
         let expandIcon = document.createElement('span');
         expandIcon.classList.add('icon', 'active');
         expandIcon.innerText = String.fromCodePoint(10133);
-       
-        function toggleIcons(icons) {
-            icons.forEach(icon => {
-                icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
-            });
-        }
     
         expandIcon.addEventListener('click', event => {
             event.stopPropagation();
 
-            toggleIcons(expandIcon.parentNode.querySelectorAll('.icon'));
+            tableObj.toggleIcons(expandIcon.parentNode.querySelectorAll('.icon'));
 
             let rowData = cell.getRow().getData();
             let columns = cell.getTable().getColumnDefinitions();
@@ -182,7 +188,7 @@ class Table {
         closeIcon.addEventListener('click', event => {
             event.stopPropagation();
 
-            toggleIcons(closeIcon.parentNode.querySelectorAll('.icon'));
+            tableObj.toggleIcons(closeIcon.parentNode.querySelectorAll('.icon'));
 
             let dataContainer = cell.getRow().getElement().querySelector('.data-container');
             dataContainer.classList.remove('active');
@@ -242,7 +248,7 @@ class Table {
         return null;
     }
 
-    addNote(cell) {
+    addNote(cell, tableObj) {
         let addNote = document.createElement('span');
         addNote.classList.add('icon', 'active');
         addNote.innerText = String.fromCodePoint(9997);
@@ -254,28 +260,51 @@ class Table {
         let iconContainer = document.createElement('div');
         iconContainer.appendChild(addNote);
         iconContainer.appendChild(notBookable);
-               
-        function toggleIcons(icons) {
-            icons.forEach(icon => {
-                icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
-            });
-        }
         
-        function addNoteFunctionality(event, cell, toggleIcons) {
+        async function addNoteFunctionality(event, cell) {
             event.stopPropagation();
-            //get note that exists
 
-            //create form with submit and cancel buttons
-            //subline number and long note field
+            let tableWindow = document.querySelector(`#${tableObj.tableId}-window`);
 
-            //display form
+            let form = tableWindow.querySelector('.not-bookable');
+            if (!form) {
+                let formTemplate = await getHTMLTemplate('./templates/notBookableForm.html');
+                form = formTemplate.querySelector('form');
+            }
 
-            //if note then toggle
-            toggleIcons(addNote.parentNode.querySelectorAll('.icon'));
+            form.classList.add('active');
+
+            let cancelButton = form.querySelector('.cancel');
+            cancelButton.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                cancelButton.parentNode.classList.remove('active');
+            });
+
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+
+                let nbNote = event.target.elements.note.value;
+
+                cell.setValue(nbNote);
+
+                if (nbNote && cell.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(9997) ||
+                    !nbNote && cell.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(128277)) {
+                    tableObj.toggleIcons(cell.getElement().querySelectorAll('.icon'));
+                }
+            });
+
+            tableWindow.appendChild(form);
+
+            let formName = form.querySelector('.name');
+            formName.innerText = `Add a note for subline: ${cell.getRow().getData().subscription_line_id}`;
+
+            //get note that exists and add to note input element
+            form.querySelector('.note').value = cell.getValue() === undefined ? '' : cell.getValue();
         }
     
-        addNote.addEventListener('click', (event) => {addNoteFunctionality(event, cell, toggleIcons)});
-        notBookable.addEventListener('click', (event) => {addNoteFunctionality(event, cell, toggleIcons)});
+        addNote.addEventListener('click', event => {addNoteFunctionality(event, cell)});
+        notBookable.addEventListener('click', event => {addNoteFunctionality(event, cell)});
 
         return iconContainer;
     }
@@ -346,10 +375,10 @@ class Table {
                 rowFormatter: this.expandableRow,
 
                 columns:[
-                    {formatter: this.expandRow, hozAlign:"center", headerSort:false},
+                    {formatter: this.expandRow, formatterParams: () => {return this}, hozAlign:"center", headerSort:false},
                     {formatter: this.openNextIcon, formatterParams: () => {return 'tx'}, hozAlign:"center", headerSort:false},
                     {formatter: this.hotelsIcon, hozAlign:"center", headerSort:false},
-                    {title: "add Note", formatter: this.addNote, hozAlign:"center", headerSort:false},
+                    {title: "add Note", formatter: this.addNote, formatterParams: () => {return this}, hozAlign:"center", headerSort:false},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},
