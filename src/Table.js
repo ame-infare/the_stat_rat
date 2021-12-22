@@ -260,7 +260,7 @@ class Table {
         let iconContainer = document.createElement('div');
         iconContainer.appendChild(addNote);
         iconContainer.appendChild(notBookable);
-        
+
         async function addNoteFunctionality(event, cell) {
             event.stopPropagation();
 
@@ -270,37 +270,49 @@ class Table {
             if (!form) {
                 let formTemplate = await getHTMLTemplate('./templates/notBookableForm.html');
                 form = formTemplate.querySelector('form');
+    
+                let cancelButton = form.querySelector('.cancel');
+                cancelButton.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    cancelButton.parentNode.classList.remove('active');
+                });
+                                  
+                form.addEventListener('submit', event => {
+                    event.preventDefault();
+    
+                    let nbNote = event.target.elements.note.value;
+                    let rowIndex = event.target.elements.index.value;
+    
+                    let cellToModify = cell.getTable().getRowFromPosition(rowIndex).getCell(cell.getColumn())
+    
+                    cellToModify.setValue(nbNote);
+    
+                    if (nbNote && cellToModify.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(9997) ||
+                        !nbNote && cellToModify.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(128277)) {
+                        tableObj.toggleIcons(cellToModify.getElement().querySelectorAll('.icon'));
+                    }
+    
+                    form.classList.remove('active');
+                });
+    
+                tableWindow.appendChild(form);
             }
-
+            
             form.classList.add('active');
-
-            let cancelButton = form.querySelector('.cancel');
-            cancelButton.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-                cancelButton.parentNode.classList.remove('active');
-            });
-
-            form.addEventListener('submit', event => {
-                event.preventDefault();
-
-                let nbNote = event.target.elements.note.value;
-
-                cell.setValue(nbNote);
-
-                if (nbNote && cell.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(9997) ||
-                    !nbNote && cell.getElement().querySelector('.icon.active').innerText === String.fromCodePoint(128277)) {
-                    tableObj.toggleIcons(cell.getElement().querySelectorAll('.icon'));
-                }
-            });
-
-            tableWindow.appendChild(form);
 
             let formName = form.querySelector('.name');
             formName.innerText = `Add a note for subline: ${cell.getRow().getData().subscription_line_id}`;
 
             //get note that exists and add to note input element
             form.querySelector('.note').value = cell.getValue() === undefined ? '' : cell.getValue();
+
+            //set row index position to the form
+            let rowIndex = document.createElement('input');
+            rowIndex.setAttribute('type', 'hidden');
+            rowIndex.setAttribute('name', 'index');
+            rowIndex.setAttribute('value', cell.getRow().getPosition());
+            form.appendChild(rowIndex);
         }
     
         addNote.addEventListener('click', event => {addNoteFunctionality(event, cell)});
