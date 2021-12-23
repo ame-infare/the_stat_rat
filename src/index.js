@@ -30,7 +30,7 @@ async function openNewTab(selectedRows, windowName) {
 }
 
 async function createNavBarButton(rowsData, elementId) {
-    let navBarTemplate = await getHTMLTemplate('./templates/tabButton.html');
+    let navBarTemplate = await getHTMLTemplate('tabButton.html');
 
     let navBarButton = navBarTemplate.querySelector('li');
     navBarButton.dataset.tab = `${elementId}-window`;
@@ -56,7 +56,7 @@ async function createNavBarButton(rowsData, elementId) {
 }
 
 async function createWindow(elementId) {
-    let newWindowTemplate = await getHTMLTemplate('./templates/window.html');
+    let newWindowTemplate = await getHTMLTemplate('window.html');
 
     let windowContainer = newWindowTemplate.querySelector('.window');
     windowContainer.id = `${elementId}-window`;
@@ -70,7 +70,7 @@ async function createWindow(elementId) {
 async function setupButtons(elementId, newWindowTemplate) {
     let buttonsToAdd = allTables[elementId].getTableOptions('buttons');
     if (buttonsToAdd) {
-        let buttonTemplates = await getHTMLTemplate('./templates/windowButtons.html');
+        let buttonTemplates = await getHTMLTemplate('windowButtons.html');
         let buttonsContainer = newWindowTemplate.querySelector('.window-buttons');
 
         await buttonsToAdd.forEach(button => {

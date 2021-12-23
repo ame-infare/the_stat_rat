@@ -1,7 +1,7 @@
 const { PythonShell } = require('python-shell');
 
 async function getHTMLTemplate(path) {
-    const response = await fetch(path);
+    const response = await fetch(`./templates/${path}`);
     const template = await response.text();
     return document.createRange().createContextualFragment(template);
 }
@@ -268,8 +268,14 @@ class Table {
 
             let form = tableWindow.querySelector('.not-bookable');
             if (!form) {
-                let formTemplate = await getHTMLTemplate('./templates/notBookableForm.html');
+                let formTemplate = await getHTMLTemplate('notBookableForm.html');
                 form = formTemplate.querySelector('form');
+
+                //add element to store row index in the form
+                let rowIndex = document.createElement('input');
+                rowIndex.setAttribute('type', 'hidden');
+                rowIndex.setAttribute('name', 'index');
+                form.appendChild(rowIndex);
     
                 let cancelButton = form.querySelector('.cancel');
                 cancelButton.addEventListener('click', event => {
@@ -305,20 +311,66 @@ class Table {
             formName.innerText = `Add a note for subline: ${cell.getRow().getData().subscription_line_id}`;
 
             //get note that exists and add to note input element
-            form.querySelector('.note').value = cell.getValue() === undefined ? '' : cell.getValue();
+            //make input in focus
+            let inputElement = form.querySelector('.note');
+            inputElement.focus();
+            inputElement.value = cell.getValue() === undefined ? '' : cell.getValue();
 
             //set row index position to the form
-            let rowIndex = document.createElement('input');
-            rowIndex.setAttribute('type', 'hidden');
-            rowIndex.setAttribute('name', 'index');
+            let rowIndex = form.querySelector('[name=index]')
             rowIndex.setAttribute('value', cell.getRow().getPosition());
-            form.appendChild(rowIndex);
         }
     
         addNote.addEventListener('click', event => {addNoteFunctionality(event, cell)});
         notBookable.addEventListener('click', event => {addNoteFunctionality(event, cell)});
 
         return iconContainer;
+    }
+
+    sendNotes(header) {
+        let sendNotesButton = document.createElement('button');
+        sendNotesButton.classList.add('send-notes');
+        sendNotesButton.innerText = 'send Notes';
+
+        sendNotesButton.addEventListener('click', () => {
+            let allRows = this.table.getData();
+            let rowsWithNotes = allRows.filter(row => row.add_note);
+
+            if (rowsWithNotes.length > 0) {
+                getHTMLTemplate('freeForm.html').then((form) => {
+                    let formElement = form.querySelector('form');
+
+                    let data = document.createElement('ul');
+                    rowsWithNotes.forEach(row => {
+                        let rowData = document.createElement('li');
+                        rowData.innerText = `SUBLINE: ${row.subscription_line_id} NOTE: ${row.add_note}`;
+                        data.appendChild(rowData);
+                    });
+    
+                    formElement.prepend(data);
+
+                    formElement.addEventListener('submit', event => {
+                        event.stopPropagation();
+                        event.preventDefault();
+
+                        //send to python query
+                        formElement.remove();
+                    });
+
+                    formElement.querySelector('.cancel').addEventListener('click', event => {
+                        event.preventDefault();
+
+                        formElement.remove();
+                    });
+
+                    formElement.classList.add('active');
+
+                    this.table.element.parentElement.appendChild(formElement);
+                });
+            }
+        });
+
+        return sendNotesButton;
     }
 
     getTableOptions(option) {
@@ -357,7 +409,11 @@ class Table {
 
             stats: {   
                 columns: [
-                    {formatter: this.openNextIcon, formatterParams: () => {return 'subs'}, hozAlign:"center", headerSort:false},
+                    {
+                        title: "SUBLINES",
+                        formatter: this.openNextIcon, formatterParams: () => {return 'subs'}, 
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
                     {title: "Prio", field: "prio"},
                     {title: "Booking site", field: "booking_site", headerFilter: true},
                     {title: "BS Id", field: "bs_id", headerFilter: true},
@@ -387,10 +443,27 @@ class Table {
                 rowFormatter: this.expandableRow,
 
                 columns:[
-                    {formatter: this.expandRow, formatterParams: () => {return this}, hozAlign:"center", headerSort:false},
-                    {formatter: this.openNextIcon, formatterParams: () => {return 'tx'}, hozAlign:"center", headerSort:false},
-                    {formatter: this.hotelsIcon, hozAlign:"center", headerSort:false},
-                    {title: "add Note", formatter: this.addNote, formatterParams: () => {return this}, hozAlign:"center", headerSort:false},
+                    {
+                        title: "EXPAND",
+                        formatter: this.expandRow, formatterParams: () => {return this},
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
+                    {
+                        title: "TRANSACTIONS",
+                        formatter: this.openNextIcon, formatterParams: () => {return 'tx'},
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
+                    {
+                        title: "HOTELS",
+                        formatter: this.hotelsIcon, 
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
+                    {
+                        title: "NOTE", field: "add_note",
+                        formatter: this.addNote, formatterParams: () => {return this},
+                        titleFormatter: this.sendNotes,
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},

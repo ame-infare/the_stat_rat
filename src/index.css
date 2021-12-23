@@ -190,7 +190,6 @@ body {
     max-height: fit-content;
     display: flex;
 
-    border-top: dashed 1px black;
     border-bottom: dashed 1px black;
 }
 .column-group {
@@ -208,4 +207,33 @@ body {
 }
 .column-group > h3 {
     text-align: center;
+}
+
+/* Add Note Not bookable Form */
+.not-bookable, .free-form {
+    display: none;
+
+    position: absolute;
+    left: 0; 
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto; 
+    width: 650px;
+    height: 130px;
+
+    border: solid black 1px;
+    background-color: var(--hover-color);
+    box-shadow: -10px 10px 25px #5e5e5e;
+
+    padding: 10px;
+}
+.not-bookable.active, .free-form.active {
+    display: block;
+}
+.not-bookable input[type="text"] {
+    width: 640px;
+}
+.not-bookable input {
+    margin: 5px;
 }
