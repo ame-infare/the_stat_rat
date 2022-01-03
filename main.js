@@ -19,7 +19,6 @@ const createWindow = () => {
         newWindow.show();
     });
 
-    newWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {

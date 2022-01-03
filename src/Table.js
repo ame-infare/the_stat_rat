@@ -44,7 +44,7 @@ class Table {
         
         let options = {
             mode: 'json',
-            pythonPath: 'python',
+            pythonPath: './env/Scripts/python',
             pythonOptions: ['-u'],
             scriptPath: './db_queries/',
             args: [JSON.stringify(message)]
