@@ -330,20 +330,26 @@ class Table {
     sendNotes(header) {
         let sendNotesButton = document.createElement('button');
         sendNotesButton.classList.add('send-notes');
-        sendNotesButton.innerText = 'send Notes';
+        sendNotesButton.innerText = 'unBook';
 
         sendNotesButton.addEventListener('click', () => {
             let allRows = this.table.getData();
             let rowsWithNotes = allRows.filter(row => row.add_note);
 
             if (rowsWithNotes.length > 0) {
-                getHTMLTemplate('freeForm.html').then((form) => {
+                getHTMLTemplate('freeForm.html').then(form => {
                     let formElement = form.querySelector('form');
 
-                    let data = document.createElement('ul');
-                    rowsWithNotes.forEach(row => {
-                        let rowData = document.createElement('li');
-                        rowData.innerText = `SUBLINE: ${row.subscription_line_id} NOTE: ${row.add_note}`;
+
+                    let data = document.createElement('div');
+                    let initialQuery = document.createElement('span');
+                    initialQuery.innerText = 'INSERT INTO beclu4.Vacation_Stats.dbo.T_Vacations_NB_Sublines (subscription_line_id, note) VALUES\n';
+                    data.appendChild(initialQuery);
+                    rowsWithNotes.forEach((row, index) => {
+                        let rowData = document.createElement('span');
+
+                        rowData.innerText = (index == 0 ? '' : ',') + `(${row.subscription_line_id}, '${row.add_note}')\n`;
+
                         data.appendChild(rowData);
                     });
     
@@ -358,6 +364,7 @@ class Table {
                     });
 
                     formElement.querySelector('.cancel').addEventListener('click', event => {
+                        event.stopPropagation();
                         event.preventDefault();
 
                         formElement.remove();

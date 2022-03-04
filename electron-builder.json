@@ -4,8 +4,7 @@
     "copyright": "",
     "directories": {
         "app": ".",
-        "output": "out",
-        "buildResources": "build-res"
+        "output": "out"
     },
     "files": [
         "main.js",

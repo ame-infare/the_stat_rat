@@ -5,6 +5,7 @@ const createWindow = () => {
         show: false,
         width: 1920,
         height: 1080,
+        //icon: __dirname + '/build-res/statRat.ico',
 
         webPreferences: {
             nodeIntegration: true,
