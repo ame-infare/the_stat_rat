@@ -6,6 +6,14 @@ import pandas as pd
 def get_message():
     return json.loads(argv[1])
 
+def modify_table(table_data, mod_id):
+    if mod_id == 'subs':
+        # add a column missing_tx with number of missing tx for that subline
+        table_data['missing_tx'] = table_data['tx_generated'] - table_data['tx_with_data'] - table_data['unavailable_dates'] - table_data['tx_invalid'] - table_data['fhm_errors']
+
+    return table_data
+
+
 def run_query(connection, query):
     return pd.read_sql(query, connection)
 
@@ -90,6 +98,8 @@ def controller(test_json=None):
     query = get_query(json_message)
 
     table_data = get_db_data(query)
+
+    table_data = modify_table(table_data, mod_id=json_message['action'])
 
     send_to_electron(table_data)
 

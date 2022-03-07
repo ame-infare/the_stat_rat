@@ -483,6 +483,7 @@ class Table {
                     {title: "destination error", field: "destination_error"},
                     {title: "fhm errors", field: "fhm_errors"},
                     {title: "unmapped", field: "unmapped"},
+                    {title: "tx missing", field: "missing_tx"},
                     {title: "tx invalid", field: "tx_invalid"},
                     {title: "tx with data", field: "tx_with_data"},
                     {title: "tx generated", field: "tx_generated"},
