@@ -32,6 +32,23 @@ class Table {
         
         this.table = new Tabulator(`#${this.tableId}`, tableTemplate);
 
+        // double left mouse click will select cell text for copying
+        this.table.on('cellDblClick', (e, cell) => {
+            let cellElement = cell.getElement();
+
+            if (document.body.createTextRange) {
+                const range = document.body.createTextRange();
+                range.moveToElementText(cellElement);
+                range.select();
+            } else if (window.getSelection) {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(cellElement);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        });
+
         this.addColumnsAsOptionsForFilterButton();
         this.setupRowSelection();
     }
