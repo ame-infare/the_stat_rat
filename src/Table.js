@@ -583,11 +583,14 @@ class Table {
     
             hotels: {
                 columns: [
+                    {title: "BS Id", field: "booking_site_id"},
                     {title: "Hotel Group", field: "hotel_group_id"},
-                    {title: "Supplier Id", field: "SupplierId", headerFilter: true},
+                    {title: "Infare Hotel Id", field: "infare_hotel_id"},
+                    {title: "Supplier Id", field: "SupplierId"},
                     {title: "Supplier Hotel Id", field: "SupplierHotelId"},
-                    {title: "Infare Hotel Id", field: "InfareHotelId"},
                     {title: "Infare Name Key", field: "InfareNameKey"},
+                    {title: "Date Mapped", field: "DateMapped"},
+                    {title: "User Updated Mapping", field: "UserUpdatedMapping"},
                     {title: "Name", field: "Name"},
                     {title: "Chain Name", field: "ChainName"},
                     {title: "Associated Location Code", field: "AssociatedLocationCode"},
@@ -603,7 +606,6 @@ class Table {
                     {title: "Longitude", field: "Longitude"},
                     {title: "Star Rating", field: "StarRating"},
                     {title: "Data Supplier", field: "DataSupplier"},
-                    {title: "Legacy Name", field: "LegacyName"}
                 ]
             },
     

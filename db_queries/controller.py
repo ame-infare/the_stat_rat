@@ -73,21 +73,51 @@ def get_query(json_message):
         db_query += ')'
 
     elif action == 'hotels':
+        
         db_query = f"""
-            DECLARE @hotel_group_id int = {data[0]["hotel_group_id"]}
-            SELECT hmd.*, sh.hotel_group_id, shim.SupplierId, shim.SupplierHotelId
-            FROM becluster.vacation.dbo.hotelMasterData hmd
-            LEFT JOIN
-                (SELECT * 
-                FROM becluster.vacation.dbo.t_specified_hotels
-                WHERE hotel_group_id = @hotel_group_id) sh 
-                ON sh.infare_hotel_id = hmd.InfareHotelId
-            LEFT JOIN
-                (SELECT *
-                FROM becluster.vacation.dbo.supplierHotelIdMapping) shim 
-                ON shim.InfareHotelId = hmd.InfareHotelId
-            WHERE sh.infare_hotel_id IS NOT null
-            ORDER BY Name
+DECLARE @hotel_group_id int = {data[0]["hotel_group_id"]}
+DECLARE @booking_site_id int = {data[0]["booking_site_id"]}
+DECLARE @collection_type VARCHAR(3) = '{data[0]["collection_type"]}'
+
+SELECT mappedData.booking_site_id, hotelGroupAndData.hotel_group_id,
+hotelGroupAndData.infare_hotel_id,
+mappedData.SupplierId, mappedData.SupplierHotelId,
+hotelGroupAndData.InfareNameKey,
+mappedData.dateMapped, mappedData.UserUpdatedMapping,
+hotelGroupAndData.Name, hotelGroupAndData.ChainName, 
+hotelGroupAndData.AssociatedLocationCode, hotelGroupAndData.LocationTypeCode,
+hotelGroupAndData.Address, hotelGroupAndData.Street1,
+hotelGroupAndData.Street2,
+hotelGroupAndData.City, hotelGroupAndData.Region, hotelGroupAndData.Postcode,
+hotelGroupAndData.Country, hotelGroupAndData.Latitude,
+hotelGroupAndData.Longitude,
+hotelGroupAndData.StarRating, hotelGroupAndData.DataSupplier
+
+FROM
+	(SELECT hotel_group.hotel_group_id, hotel_group.infare_hotel_id,
+	hotel_data.InfareNameKey, hotel_data.Name, hotel_data.ChainName, 
+	hotel_data.AssociatedLocationCode, hotel_data.LocationTypeCode,
+	hotel_data.Address, hotel_data.Street1, hotel_data.Street2,
+	hotel_data.City, hotel_data.Region, hotel_data.Postcode,
+	hotel_data.Country, hotel_data.Latitude, hotel_data.Longitude,
+	hotel_data.StarRating, hotel_data.DataSupplier
+		FROM becluster.vacation.dbo.t_specified_hotels AS hotel_group
+		INNER JOIN becluster.vacation.dbo.hotelMasterData AS hotel_data
+		ON hotel_group.infare_hotel_id = hotel_data.InfareHotelId
+		WHERE hotel_group.hotel_group_id = @hotel_group_id)
+		AS hotelGroupAndData
+LEFT JOIN 
+	(SELECT suppliers.booking_site_id, mapping.InfareHotelId,
+	mapping.SupplierId,	mapping.SupplierHotelId,
+	mapping.DateLastUpdated AS dateMapped,
+	mapping.UserLastUpdated AS UserUpdatedMapping
+	FROM Vacation_Stats.dbo.t_hotel_suppliers AS suppliers
+	INNER JOIN becluster.vacation.dbo.supplierHotelIdMapping AS mapping
+	ON mapping.SupplierId = (CASE WHEN @collection_type = 'FH' THEN suppliers.fh
+			   WHEN @collection_type = 'H' THEN suppliers.h END)
+	WHERE suppliers.booking_site_id = @booking_site_id) AS mappedData
+
+ON hotelGroupAndData.infare_hotel_id = mappedData.InfareHotelId
         """
 
     return db_query
