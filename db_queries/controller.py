@@ -9,7 +9,7 @@ def get_message():
 def modify_table(table_data, mod_id):
     if mod_id == 'subs':
         # add a column missing_tx with number of missing tx for that subline
-        table_data['missing_tx'] = table_data['tx_generated'] - table_data['tx_with_data'] - table_data['unavailable_dates'] - table_data['tx_invalid'] - table_data['fhm_errors']
+        table_data['missing_tx'] = table_data['tx_generated'] - table_data['tx_with_data'] - table_data['tx_invalid'] - table_data['fhm_errors']
 
     return table_data
 
