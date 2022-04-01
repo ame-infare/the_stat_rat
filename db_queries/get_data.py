@@ -1,7 +1,3 @@
-import base64
-from datetime import datetime, timezone, timedelta
-from weakref import proxy
-
 import requests
 
 def get_data(session):
@@ -9,10 +5,9 @@ def get_data(session):
         'date': '2022-03-30',
         'subline-id=375723': '375723'
     }
-    request = requests.Request('GET', 'https://cjs-services.infare.net/current/cjv1.0/stats/transactions/', params=query_params)
+    request = requests.Request('GET', 'https://cjs-services.infare.net/current/cjv1.0/stats/transactions/', params=query_params).prepare()
 
-    prepp_request = request.prepare()
-    response = session.send(prepp_request)
+    response = session.send(request)
 
     print(response.text)
 
@@ -23,23 +18,32 @@ def to_base64(input: str):
     return base64_bytes.decode('ascii')
 
 def log_in(session):
-    datetime_string = datetime.now(timezone(timedelta(hours=3))).strftime('%a %b %d %Y %H:%M:%S %Z')
-    datetime_base64 = to_base64(datetime_string)
-
-    query_params = {
-        'response_type': 'token',
-        'client_id': 'cjs-api-swagger',
-        'redirect_uri': 'https://cjs-services.infare.net/current/swagger/oauth2-redirect.html',
-        'scope': 'infare-services-cjv',
-        'state': {datetime_base64}
+    post_params = [
+        'grant_type=password',
+        'scope=openid profile role infare-services-voom infare-services-cjv',
+        'client_id=cjv-span-dev',
+        'client_secret=MJfmazWCXmtIBpDXNUSbxKJnaRhEDGcgdGOTKJJynBhjJVdnDo',
+        'username=CJV_IntegrationTestAdminUserDev',
+        'password=v3iYFzZoTtpoaHYVNjLO'
+    ]
+    headers = {
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept': '*/*',
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded",
     }
-    request = requests.Request('GET', 'https://identity.infare.net/connect/authorize', params=query_params)
+    request = requests.Request('POST', 'https://identity.infare.net/connect/token', data='&'.join(post_params).encode('UTF-8'), headers=headers).prepare()
     
-    prepp_request = request.prepare()
-    response = session.send(prepp_request)
+    response = session.send(request)
+    source_log_in = response.text
+
     pass
 
 session = requests.Session()
-session.proxies = {'https': '127.0.0.1'}
+session.proxies = {
+    'http': 'http://127.0.0.1:8888',
+    'https': 'http://127.0.0.1:8888'
+}
 log_in(session)
 get_data(session)
