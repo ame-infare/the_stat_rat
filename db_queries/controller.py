@@ -101,8 +101,8 @@ FROM
 	hotel_data.City, hotel_data.Region, hotel_data.Postcode,
 	hotel_data.Country, hotel_data.Latitude, hotel_data.Longitude,
 	hotel_data.StarRating, hotel_data.DataSupplier
-		FROM becluster.vacation.dbo.t_specified_hotels AS hotel_group
-		INNER JOIN becluster.vacation.dbo.hotelMasterData AS hotel_data
+		FROM vacation.dbo.t_specified_hotels AS hotel_group
+		INNER JOIN vacation.dbo.hotelMasterData AS hotel_data
 		ON hotel_group.infare_hotel_id = hotel_data.InfareHotelId
 		WHERE hotel_group.hotel_group_id = @hotel_group_id)
 		AS hotelGroupAndData
@@ -112,7 +112,7 @@ LEFT JOIN
 	mapping.DateLastUpdated AS dateMapped,
 	mapping.UserLastUpdated AS UserUpdatedMapping
 	FROM Vacation_Stats.dbo.t_hotel_suppliers AS suppliers
-	INNER JOIN becluster.vacation.dbo.supplierHotelIdMapping AS mapping
+	INNER JOIN vacation.dbo.supplierHotelIdMapping AS mapping
 	ON mapping.SupplierId = (CASE WHEN @collection_type = 'FH' THEN suppliers.fh
 			   WHEN @collection_type = 'H' THEN suppliers.h END)
 	WHERE suppliers.booking_site_id = @booking_site_id) AS mappedData
