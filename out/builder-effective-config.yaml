@@ -1,0 +1,34 @@
+directories:
+  output: out
+  buildResources: build
+  app: .
+appId: com.the_stat_rat.fileio
+productName: The Stat Rat
+copyright: ''
+files:
+  - filter:
+      - main.js
+      - package.json
+      - node_modules
+      - src/**/*
+extraFiles:
+  - filter:
+      - db_queries/*
+      - requirements.txt
+      - env/**/*
+dmg:
+  background: null
+  backgroundColor: '#ffffff'
+  window:
+    width: 400
+    height: 300
+  contents:
+    - x: 100
+      'y': 100
+    - x: 300
+      'y': 100
+      type: link
+      path: /Applications
+win:
+  target: nsis
+electronVersion: 15.3.0
