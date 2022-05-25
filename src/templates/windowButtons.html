@@ -1,0 +1,30 @@
+<template id="load-selected">
+    <button class="load-selected">Load Selected (<span class="num-selected">0</span>)</button>
+</template>
+
+<template id="filter-button">
+    <div class="filter-button">
+        <form>
+            <span>Filter: </span>
+    
+            <select name="columns">
+                <option></option>
+            </select>
+            
+            <select name="filterType">
+                <option value="=">=</option>
+                <option value="<"><</option>
+                <option value="<="><=</option>
+                <option value=">">></option>
+                <option value=">=">>=</option>
+                <option value="!=">!=</option>
+                <option value="like">like</option>
+                <option value="keywords">keywords</option>
+            </select>
+        
+            <input name="filterValue" type="text" placeholder="value">
+    
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</template>

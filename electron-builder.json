@@ -1,0 +1,43 @@
+{
+    "appId": "com.the_stat_rat.fileio",
+    "productName": "The Stat Rat",
+    "copyright": "",
+    "directories": {
+        "app": ".",
+        "output": "out"
+    },
+    "files": [
+        "main.js",
+        "package.json",
+        "node_modules",
+        "src/**/*"
+    ],
+    "extraFiles": [
+        "db_queries/*",
+        "requirements.txt",
+        "env/**/*"
+    ],
+    "dmg": {
+        "background": null,
+        "backgroundColor": "#ffffff",
+        "window": {
+            "width": "400",
+            "height": "300"
+        },
+        "contents": [
+            {
+                "x": 100,
+                "y": 100
+            },
+            {
+                "x": 300,
+                "y": 100,
+                "type": "link",
+                "path": "/Applications"
+            }
+        ]
+    },
+    "win": {
+        "target": "nsis"
+    }
+}
