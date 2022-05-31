@@ -113,4 +113,4 @@ env.bak/
 venv.bak/
 
 # out
-out/
+out/win-unpacked
