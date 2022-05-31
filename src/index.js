@@ -81,7 +81,7 @@ async function setupButtons(elementId, newWindowTemplate) {
 
     // Setting up Load Selected Button
     const loadSelectedButton = newWindowTemplate.querySelector('.load-selected');
-    const numOfSelectedRowsDial = allTables[elementId].numOfSelectedRowsDial = newWindowTemplate.querySelector('.num-selected');
+    allTables[elementId].numOfSelectedRowsDial = newWindowTemplate.querySelector('.num-selected');
     if (loadSelectedButton) {
         let nextPageName = allTables[elementId].getTableOptions('loadSelectedNextPageName');
 

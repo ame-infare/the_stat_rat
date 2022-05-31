@@ -344,7 +344,7 @@ class Table {
         return iconContainer;
     }
 
-    sendNotes(header) {
+    sendNotes() {
         let sendNotesButton = document.createElement('button');
         sendNotesButton.classList.add('send-notes');
         sendNotesButton.innerText = 'unBook';
@@ -406,7 +406,7 @@ class Table {
             subs: {
                 tabNameDataKeys: ['booking_site', 'key'],
                 loadSelectedNextPageName: 'tx',
-                buttons: ['load-selected', 'filter-button']
+                buttons: ['load-selected', 'filter-button', 'valid', 'invalid']
             },
             tx: {
                 tabNameDataKeys: ['subscription_line_id', 'key'],
