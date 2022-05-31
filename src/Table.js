@@ -415,6 +415,14 @@ class Table {
             hotels: {
                 tabNameDataKeys: ['hotel_group_id', 'subscription_line_id'],
                 buttons: ['filter-button']
+            },
+            valid: {
+                tabNameDataKeys: ['booking_site_id'],
+                buttons: ['filter-button']
+            },
+            invalid: {
+                tabNameDataKeys: ['booking_site_id'],
+                buttons: ['filter-button']
             }
         }
 

@@ -36,18 +36,24 @@ async function createNavBarButton(rowsData, elementId) {
     navBarButton.dataset.tab = `${elementId}-window`;
 
     let tabNameHTML = navBarTemplate.querySelector('.tab-name');
-
+    
     if (rowsData !== null) {
         tabNameDataKeys = allTables[elementId].getTableOptions('tabNameDataKeys');
         for (let index = 0; index < rowsData.length; index++) {
             if (index > 0) {
                 tabNameHTML.innerText += ', ';
             }
-
-            tabNameHTML.innerText += `${rowsData[index][tabNameDataKeys[0]]} ${rowsData[index][tabNameDataKeys[1]]}`;
+            let tabName = tabNameDataKeys.map(key => rowsData[index][key]).join(" ")
+            tabNameHTML.innerText += tabName;
         }
     } else {
         tabNameHTML.innerText = 'STATS';
+    }
+
+    if (elementId.startsWith('valid')) {
+        tabNameHTML.innerText += ' valid data';
+    } else if (elementId.startsWith('invalid')) {
+        tabNameHTML.innerText += ' invalid data';
     }
     
     document.getElementById('nav').appendChild(navBarTemplate)
@@ -91,6 +97,22 @@ async function setupButtons(elementId, newWindowTemplate) {
             openNewTab(allTables[elementId].selectedRows, nextPageName);
 
             allTables[elementId].clearSelections();
+        });
+    }
+    
+    // Setting up Valid and Invalid data buttons
+    const validDataButton = newWindowTemplate.querySelector('.valid');
+    if (validDataButton) {
+        validDataButton.addEventListener('click', function(event){
+            event.stopPropagation();
+            openNewTab([allTables[elementId].table.getRows()[0]], 'valid');
+        });
+    }
+    const invalidDataButton = newWindowTemplate.querySelector('.invalid');
+    if (invalidDataButton) {
+        invalidDataButton.addEventListener('click', function(event){
+            event.stopPropagation();
+            openNewTab([allTables[elementId].table.getRows()[0]], 'invalid');
         });
     }
 
