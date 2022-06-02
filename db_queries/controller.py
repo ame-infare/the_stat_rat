@@ -120,6 +120,16 @@ LEFT JOIN
 ON hotelGroupAndData.infare_hotel_id = mappedData.InfareHotelId
         """
 
+    elif action == 'valid':
+        db_query = f"""
+SELECT *
+FROM [beclu4].[vacation_data_kafka].[dbo].[T_fare_observation_vac]
+WHERE
+	booking_site_id = {data[0]["booking_site_id"]}
+
+ORDER BY scheduler_active_queue_id, search_rank DESC
+        """
+
     return db_query
 
 def controller(test_json=None):
