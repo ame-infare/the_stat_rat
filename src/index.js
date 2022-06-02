@@ -105,14 +105,20 @@ async function setupButtons(elementId, newWindowTemplate) {
     if (validDataButton) {
         validDataButton.addEventListener('click', function(event){
             event.stopPropagation();
-            openNewTab([allTables[elementId].table.getRows()[0]], 'valid');
+            const selectedRows = allTables[elementId].selectedRows;
+            if (selectedRows) {
+                openNewTab([selectedRows], 'valid');
+            }
         });
     }
     const invalidDataButton = newWindowTemplate.querySelector('.invalid');
     if (invalidDataButton) {
         invalidDataButton.addEventListener('click', function(event){
             event.stopPropagation();
-            openNewTab([allTables[elementId].table.getRows()[0]], 'invalid');
+            const selectedRows = allTables[elementId].selectedRows;
+            if (selectedRows) {
+                openNewTab([selectedRows], 'invalid');
+            }
         });
     }
 

@@ -121,11 +121,14 @@ ON hotelGroupAndData.infare_hotel_id = mappedData.InfareHotelId
         """
 
     elif action == 'valid':
+        search_criterias = " OR ".join(map(
+            lambda row: f"search_criteria_rowid_array LIKE '%{row.subscription_line_id}%'", data
+        ))
         db_query = f"""
 SELECT *
 FROM [beclu4].[vacation_data_kafka].[dbo].[T_fare_observation_vac]
 WHERE
-	booking_site_id = {data[0]["booking_site_id"]}
+	{search_criterias}
 
 ORDER BY scheduler_active_queue_id, search_rank DESC
         """
