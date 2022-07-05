@@ -106,8 +106,8 @@ async function setupButtons(elementId, newWindowTemplate) {
         validDataButton.addEventListener('click', function(event){
             event.stopPropagation();
             const selectedRows = allTables[elementId].selectedRows;
-            if (selectedRows) {
-                openNewTab([selectedRows], 'valid');
+            if (selectedRows.length > 0) {
+                openNewTab(selectedRows, 'valid');
             }
         });
     }
@@ -116,8 +116,8 @@ async function setupButtons(elementId, newWindowTemplate) {
         invalidDataButton.addEventListener('click', function(event){
             event.stopPropagation();
             const selectedRows = allTables[elementId].selectedRows;
-            if (selectedRows) {
-                openNewTab([selectedRows], 'invalid');
+            if (selectedRows.length > 0) {
+                openNewTab(selectedRows, 'invalid');
             }
         });
     }

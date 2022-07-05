@@ -122,7 +122,7 @@ ON hotelGroupAndData.infare_hotel_id = mappedData.InfareHotelId
 
     elif action == 'valid':
         search_criterias = " OR ".join(map(
-            lambda row: f"search_criteria_rowid_array LIKE '%{row.subscription_line_id}%'", data
+            lambda row: f"search_criteria_rowid_array LIKE '%{row['subscription_line_id']}%'", data
         ))
         db_query = f"""
 SELECT *

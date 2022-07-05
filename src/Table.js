@@ -417,11 +417,11 @@ class Table {
                 buttons: ['filter-button']
             },
             valid: {
-                tabNameDataKeys: ['booking_site_id'],
+                tabNameDataKeys: ['subscription_line_id'],
                 buttons: ['filter-button']
             },
             invalid: {
-                tabNameDataKeys: ['booking_site_id'],
+                tabNameDataKeys: ['subscription_line_id'],
                 buttons: ['filter-button']
             }
         }
