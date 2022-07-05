@@ -397,6 +397,17 @@ class Table {
         return sendNotesButton;
     }
 
+    formatUnixTime(cell) {
+        let unixTime = cell.getValue();
+        if (unixTime) {
+            let date = new Date(unixTime);
+
+            return date.toISOString().replace('T', ' ').replace('Z', '')
+        }
+        
+        return null;
+    }
+
     getTableOptions(option) {
         let options = {
             stats: {
@@ -466,7 +477,10 @@ class Table {
                     {title: "%tx_inv", field: "%tx_inv"},
                     {title: "%tx_miss", field: "%tx_miss"},
                     {title: "%tx_limit", field: "%tx_limit"},
-                    {title: "Issue date", field: "issue_date"},
+                    {
+                        title: "Issue date", field: "issue_date",
+                        formatter: this.formatUnixTime
+                    },
                     {title: "Aff profiles", field: "affected_profiles"},
                 ]
             },
@@ -647,7 +661,14 @@ class Table {
             },
 
             valid: {
+                rowFormatter: this.expandableRow,
+
                 columns: [
+                    {
+                        title: "EXPAND",
+                        formatter: this.expandRow, formatterParams: () => {return this},
+                        hozAlign:"center", headerSort:false, headerVertical:true
+                    },
                     {title: "Queue Id", field: "scheduler_active_queue_id"},
                     {title: "Search Rank", field: "search_rank"},
                     {
