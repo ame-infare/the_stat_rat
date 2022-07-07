@@ -179,33 +179,43 @@ body {
 
 .data-container {
     position: relative;
-    max-height: 0px;
     display: none;
-
-    transition: 5s;
 }
 .data-container.active {
-    position: relative;
-
-    max-height: fit-content;
     display: flex;
+
+    align-items: flex-start;
 
     border-bottom: dashed 1px black;
 }
 .column-group {
     list-style-type: none;
+    max-height: 300px;
+    width: fit-content;
 
-    padding: 0.7em;
-    margin: 1em;
+    padding: 0.2em;
+    margin: 0.1em;
 
     border: black solid 1px;
     border-radius: 10px;
+
+    background-color: rgba(0,0,0,.2);
+
+    display: flex;
+    flex-wrap: wrap;
+    writing-mode: vertical-lr;
+    text-orientation: upright;
 }
 .column-group > li {
     margin: 0.3em;
     letter-spacing: 0.03em;
+
+    font-size: 0.9em;
+    writing-mode: horizontal-tb;
 }
 .column-group > h3 {
+    writing-mode: horizontal-tb;
+    margin: 0;
     text-align: center;
 }
 
