@@ -597,7 +597,7 @@ class Table {
                             {title: "End date", field: "end_date"},
                             {title: "End date proj", field: "end_date_proj"},
                             {title: "Start time", field: "start_time"},
-                            {title: "Begin run datetime utc", field: "begin_run_datetime_utc_diff"},
+                            {title: "Begin run datetime utc", field: "begin_run_datetime_utc_diff", formatter: this.formatUnixTime},
                             {title: "Min begin run datetime utc", field: "min_begin_run_datetime_utc_diff"},
                             {title: "End run datetime utc", field: "end_run_datetime_utc"},
                             {title: "Allowed runtime minutes", field: "allowed_runtime_minutes"},
@@ -613,7 +613,7 @@ class Table {
                             {title: "Note NB", field: "note_NB"},
                             {title: "last_touched_NB", field: "last_touched_NB"},
                             {title: "last_touched_by_NB", field: "last_touched_by_NB"},
-                            {title: "last_touched", field: "last_touched"},
+                            {title: "last_touched", field: "last_touched", formatter: this.formatUnixTime},
                             {title: "last_touched_by", field: "last_touched_by"}
                         ]
                     },
