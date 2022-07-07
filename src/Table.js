@@ -223,6 +223,7 @@ class Table {
 
         let expandableDataContainer = document.createElement('div');
         expandableDataContainer.classList.add('data-container');
+        expandableDataContainer.classList.add('tabulator-responsive-collapse');
         rowElement.appendChild(expandableDataContainer);
     }
 
@@ -441,7 +442,8 @@ class Table {
                 layout: "fitDataFill",
                 height: "100%",
                 selectable: true,
-                scrollToRowIfVisible: true, //otherwise expandable rows are buggy when scrolling
+                pagination: true,
+                paginationSize: 100,
             },
 
             stats: {   
@@ -739,6 +741,7 @@ class Table {
 
             valid: {
                 rowFormatter: this.expandableRow,
+                paginationSize: 30,
 
                 columns: [
                     {
