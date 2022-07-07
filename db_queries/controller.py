@@ -43,8 +43,8 @@ def get_query(json_message):
 
     elif action == 'subs':
         db_query = """SELECT * FROM beclu4.Vacation_Stats.dbo.V_vacations_subscription_line_stats
-                      WHERE relevant > 0
-                      AND ("""
+                      WHERE
+                      ("""
 
         for index, booking_site in enumerate(data):
             if index > 0:

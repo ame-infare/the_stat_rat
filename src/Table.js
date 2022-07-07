@@ -399,13 +399,7 @@ class Table {
 
     formatUnixTime(cell) {
         let unixTime = cell.getValue();
-        if (unixTime) {
-            let date = new Date(unixTime);
-
-            return date.toISOString().replace('T', ' ').replace('Z', '')
-        }
-        
-        return null;
+        return unixTime ? new Date(unixTime).toISOString().replace('T', ' ').replace('Z', '') : null;
     }
 
     getTableOptions(option) {
@@ -510,6 +504,8 @@ class Table {
                         titleFormatter: this.sendNotes,
                         hozAlign:"center", headerSort:false, headerVertical:true
                     },
+                    {title: "Relevant", field: "relevant", headerVertical:true},
+                    {title: "Resolve Type", field: "resolve_type", headerVertical:true},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},
@@ -531,35 +527,38 @@ class Table {
                     {
                         title: "Travel info",
                         columns: [
-                            {title: "POS", field: "pos"},
-                            {title: "Origin", field: "flight_origin"},
-                            {title: "Origin type", field: "flight_origin_type"},
-                            {title: "Destination", field: "destination"},
-                            {title: "Destination type", field: "destination_type"},
-                            {title: "User input", field: "destination_user_input"},
-                            {title: "Adults", field: "adults"},
-                            {title: "Children", field: "children"},
+                            {title: "POS", field: "pos", headerFilter: true},
+                            {title: "Origin", field: "flight_origin", headerFilter: true},
+                            {title: "Origin type", field: "flight_origin_type", headerFilter: true},
+                            {title: "Destination", field: "destination", headerFilter: true},
+                            {title: "Destination type", field: "destination_type", headerFilter: true},
+                            {title: "User input", field: "destination_user_input", headerFilter: true},
+                            {title: "User input proj", field: "destination_user_input_proj", headerFilter: true},
+                            {title: "Adults", field: "adults", headerFilter: true},
+                            {title: "Children", field: "children", headerFilter: true},
                         ]
                     },
                     {
                         title: "Flight",
                         columns: [
                             {title: "Flight included", field: "flight_included"},
-                            {title: "Searched cabin", field: "flight_searched_cabin"},
-                            {title: "Max connections", field: "flight_max_connections"},
-                            {title: "Carrier", field: "flight_carrier"},
-                            {title: "Arrival Requirement", field: "flight_arrival_requirement"}
+                            {title: "Searched cabin", field: "flight_searched_cabin", headerFilter: true},
+                            {title: "Max connections", field: "flight_max_connections", headerFilter: true},
+                            {title: "Carrier", field: "flight_carrier", headerFilter: true},
+                            {title: "Arrival Requirement", field: "flight_arrival_requirement", headerFilter: true}
                         ]
                     },
                     {
                         title: "Hotel",
                         columns: [
                             {title: "Hotel included", field: "hotel_included"},
-                            {title: "Hotel group", field: "hotel_group_id"},
+                            {title: "Hotel group", field: "hotel_group_id", headerFilter: true},
                             {title: "Hotels specified", field: "hotels_specified"},
+                            {title: "Hotels specified proj", field: "hotels_specified_proj"},
+                            {title: "Hotels Recognized", field: "hotels_recognized"},
                             {title: "Hotel count to collect", field: "hotel_count_to_collect"},
                             {title: "Room options", field: "hotel_room_options"},
-                            {title: "Board basis", field: "hotel_board_basis"},
+                            {title: "Board basis", field: "hotel_board_basis", headerFilter: true},
                             {title: "Rating filter", field: "hotel_rating_filter"}
                         ]
                     },
@@ -568,12 +567,12 @@ class Table {
                         columns: [
                             {title: "Car included", field: "car_included"},
                             {title: "Car offers per vendor", field: "car_offers_per_vendor"},
-                            {title: "Vendor", field: "car_vendor"},
-                            {title: "SIPP code", field: "car_sipp_code"},
-                            {title: "Car discount code", field: "car_discount_code"},
+                            {title: "Vendor", field: "car_vendor", headerFilter: true},
+                            {title: "SIPP code", field: "car_sipp_code", headerFilter: true},
+                            {title: "Car discount code", field: "car_discount_code", headerFilter: true},
                             {title: "Pickup time", field: "car_pickup_time"},
                             {title: "Dropoff time", field: "car_dropoff_time"},
-                            {title: "Dropoff location", field: "car_dropoff_location"},
+                            {title: "Dropoff location", field: "car_dropoff_location", headerFilter: true},
                             {title: "Dropoff location type", field: "car_dropoff_location_type"},
                         ]
                     },
@@ -596,10 +595,88 @@ class Table {
                             {title: "Schedule id", field: "collection_schedule_id"},
                             {title: "Start date", field: "start_date"},
                             {title: "End date", field: "end_date"},
+                            {title: "End date proj", field: "end_date_proj"},
                             {title: "Start time", field: "start_time"},
+                            {title: "Begin run datetime utc", field: "begin_run_datetime_utc_diff"},
+                            {title: "Min begin run datetime utc", field: "min_begin_run_datetime_utc_diff"},
+                            {title: "End run datetime utc", field: "end_run_datetime_utc"},
                             {title: "Allowed runtime minutes", field: "allowed_runtime_minutes"},
+                            {title: "Run date utc next", field: "run_date_utc_next"},
+                            {title: "Tx generated next", field: "tx_generated_next"},
                         ]
                     },
+                    {
+                        title: "Notes",
+                        columns: [
+                            {title: "Note", field: "note"},
+                            {title: "Note auto", field: "note_auto"},
+                            {title: "Note NB", field: "note_NB"},
+                            {title: "last_touched_NB", field: "last_touched_NB"},
+                            {title: "last_touched_by_NB", field: "last_touched_by_NB"},
+                            {title: "last_touched", field: "last_touched"},
+                            {title: "last_touched_by", field: "last_touched_by"}
+                        ]
+                    },
+                    {
+                        title: "FHM Primary",
+                        columns: [
+                            {title: "Flight matching", field: "flight_matching"},
+                            {title: "Hotel matching", field: "hotel_matching"},
+                            {title: "Booking site id", field: "primary_booking_site_id"},
+                            {title: "Subscription line id", field: "primary_subscription_line_id"},
+                            {title: "Subscription line id proj", field: "primary_subscription_line_id_proj"},
+                            {title: "Run date utc", field: "primary_run_date_utc"},
+                            {title: "Resolve type", field: "primary_resolve_type"},
+                            {title: "Valid", field: "primary_valid"},
+                            {title: "Invalid all", field: "primary_invalid_all"},
+                            {title: "Room error", field: "primary_room_error"},
+                            {title: "Hotel error", field: "primary_hotel_error"},
+                            {title: "Flight error", field: "primary_flight_error"},
+                            {title: "Unmapped", field: "primary_unmapped"},
+                            {title: "Tx invalid", field: "primary_tx_invalid"},
+                            {title: "Tx with data", field: "primary_tx_with_data"},
+                            {title: "Tx generated", field: "primary_tx_generated"},
+                            {title: "Unavailable dates", field: "primary_unavailable_dates"},
+                            {title: "Destination error", field: "primary_destination_error"},
+                            {title: "Fhm errors", field: "primary_fhm_errors"},
+                            {title: "Invalid2", field: "primary_invalid2"},
+                            {title: "End run datetime utc", field: "primary_end_run_datetime_utc"},
+                            {title: "Hotels recognized", field: "primary_hotels_recognized"},
+                            {title: "Hotels specified proj", field: "primary_hotels_specified_proj"},
+                            {title: "Destination user input proj", field: "primary_destination_user_input_proj"},
+                            {title: "End date proj", field: "primary_end_date_proj"},
+                            {title: "Data source id", field: "primary_data_source_id"},
+                            {title: "Destination user input", field: "primary_destination_user_input"},
+                            {title: "Flight searched cabin", field: "primary_flight_searched_cabin"},
+                            {title: "Flight max connections", field: "primary_flight_max_connections"},
+                            {title: "Flight carrier", field: "primary_flight_carrier"},
+                            {title: "Flight arrival requirement", field: "primary_flight_arrival_requirement"},
+                            {title: "Wildcard", field: "primary_wildcard"},
+                            {title: "Collection schedule id", field: "primary_collection_schedule_id"},
+                            {title: "Start date", field: "primary_start_date"},
+                            {title: "End date", field: "primary_end_date"},
+                            {title: "Is priority", field: "primary_is_priority"},
+                            {title: "Last touched", field: "primary_last_touched"},
+                            {title: "Last touched by", field: "primary_last_touched_by"},
+                            {title: "Note", field: "primary_note"},
+                            {title: "Last touched NB", field: "primary_last_touched_NB"},
+                            {title: "Last_touched_by_NB", field: "primary_last_touched_by_NB"},
+                            {title: "Note_NB", field: "primary_note_NB"},
+                            {title: "Start_time", field: "primary_start_time"},
+                            {title: "Allowed_runtime_minutes", field: "primary_allowed_runtime_minutes"},
+                            {title: "Is_active_profile", field: "primary_is_active_profile"},
+                        ]
+                    },
+                    {
+                        title: "Data",
+                        columns: [
+                            {title: "Booking site id", field: "booking_site_id"},
+                            {title: "Data source id", field: "data_source_id"},
+                            {title: "Collection type", field: "collection_type"},
+                            {title: "Is active profile", field: "is_active_profile"},
+                            {title: "Profile city", field: "profileCity"},
+                        ]
+                    }
                 ],
             },
     
