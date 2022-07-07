@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "python-shell": "^3.0.1",
-    "tabulator-tables": "^5.0.6"
+    "tabulator-tables": "^5.2.7"
   }
 }
