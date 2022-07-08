@@ -15,6 +15,7 @@ class Table {
         this.table;
 
         this.numOfSelectedRowsDial;
+        this._initTemplates()
     }
 
     clearSelections() {
@@ -435,9 +436,9 @@ class Table {
         return options[this.type][option];
     }
 
-    getTableTemplate() {
-        let templates = {
-
+    _initTemplates() {
+        this.templates = {
+    
             default: {
                 layout: "fitDataFill",
                 height: "100%",
@@ -445,7 +446,7 @@ class Table {
                 pagination: true,
                 paginationSize: 100,
             },
-
+    
             stats: {   
                 columns: [
                     {
@@ -483,7 +484,7 @@ class Table {
     
             subs: {
                 rowFormatter: this.expandableRow,
-
+    
                 columns:[
                     {
                         title: "EXPAND",
@@ -738,11 +739,11 @@ class Table {
                     {title: "ID", field: "ID"},
                 ]
             },
-
-            valid: {
+    
+            validInvalid: {
                 rowFormatter: this.expandableRow,
                 paginationSize: 30,
-
+    
                 columns: [
                     {
                         title: "EXPAND",
@@ -756,6 +757,35 @@ class Table {
                         columns: [
                             {title: "Found BPTD UTC", field: "found_BPTD_utc"},
                             {title: "Found BPTS UTC", field: "found_BPTS_utc"},
+                        ]
+                    },
+                    {
+                        title: "OUT general",
+                        columns: [
+                            {title: "BPTD Departure", field: "out_BPTD_departure"},
+                            {title: "BPTS Departure", field: "out_BPTS_departure"},
+                            {title: "BPT Arrival", field: "out_BPT_arrival"},
+                            {title: "Duration", field: "out_duration"},
+                            {title: "Segments Count", field: "out_segments_count"},
+                            {title: "Legs Count", field: "out_legs_count"},
+                            {title: "Distance km", field: "out_distance_km"},
+                            {title: "Main Segment", field: "out_main_segment"},
+                            {title: "Origin Station Code", field: "out_origin_station_code"},
+                            {title: "Destination Station Code", field: "out_destination_station_code"},
+                            {title: "Cabin Class", field: "out_cabin_class"},
+                            {title: "Fare Family", field: "out_fare_family"},
+                            {title: "Booking Class", field: "out_booking_class"},
+                            {title: "Fare Basis Code", field: "out_fare_basis_code"},
+                            {title: "Fare exc", field: "out_fare_exc"},
+                            {title: "Fare exc", field: "out_fare_exc_x1000"},
+                            {title: "Fare inc", field: "out_fare_inc"},
+                            {title: "Fare inc", field: "out_fare_inc_x1000"},
+                            {title: "Taxes fees", field: "out_taxes_fees"},
+                            {title: "Taxes fees", field: "out_taxes_fees_x1000"},
+                            {title: "Fare exc USD", field: "out_fare_exc_usd"},
+                            {title: "Fare exc USD", field: "out_fare_exc_usd_x1000"},
+                            {title: "Fare inc USD", field: "out_fare_inc_usd"},
+                            {title: "Fare inc USD", field: "out_fare_inc_usd_x1000"},
                         ]
                     },
                     {
@@ -812,6 +842,35 @@ class Table {
                         ]
                     },
                     {
+                        title: "IN General",
+                        columns: [
+                            {title: "BPTD Departure", field: "in_BPTD_departure"},
+                            {title: "BPTS Departure", field: "in_BPTS_departure"},
+                            {title: "BPT Arrival", field: "in_BPT_arrival"},
+                            {title: "Duration", field: "in_duration"},
+                            {title: "Segments Count", field: "in_segments_count"},
+                            {title: "Legs Count", field: "in_legs_count"},
+                            {title: "Distance km", field: "in_distance_km"},
+                            {title: "Main Segment", field: "in_main_segment"},
+                            {title: "Origin Station Code", field: "in_origin_station_code"},
+                            {title: "Destination Station Code", field: "in_destination_station_code"},
+                            {title: "Cabin Class", field: "in_cabin_class"},
+                            {title: "Fare Family", field: "in_fare_family"},
+                            {title: "Booking Class", field: "in_booking_class"},
+                            {title: "Fare Basis Code", field: "in_fare_basis_code"},
+                            {title: "Fare exc", field: "in_fare_exc"},
+                            {title: "Fare exc", field: "in_fare_exc_x1000"},
+                            {title: "Fare inc", field: "in_fare_inc"},
+                            {title: "Fare inc", field: "in_fare_inc_x1000"},
+                            {title: "Taxes fees", field: "in_taxes_fees"},
+                            {title: "Taxes fees", field: "in_taxes_fees_x1000"},
+                            {title: "Fare exc USD", field: "in_fare_exc_usd"},
+                            {title: "Fare exc USD", field: "in_fare_exc_usd_x1000"},
+                            {title: "Fare inc USD", field: "in_fare_inc_usd"},
+                            {title: "Fare inc USD", field: "in_fare_inc_usd_x1000"},
+                        ]
+                    },
+                    {
                         title: "IN flight data",
                         columns: [
                             {title: "Seg1 Origin station code", field: "in_seg1_origin_station_code"},
@@ -830,7 +889,6 @@ class Table {
                             {title: "Seg1 Fare Family", field: "in_seg1_fare_family"},
                             {title: "Seg1 Booking Class", field: "in_seg1_booking_class"},
                             {title: "Seg1 Fare Basis", field: "in_seg1_fare_basis_code"},
-
                             {title: "Seg1 Origin station code", field: "in_seg2_origin_station_code"},
                             {title: "Seg1 Dest station code", field: "in_seg2_destination_station_code"},
                             {title: "Seg1 Carrier", field: "in_seg2_carrier_code"},
@@ -847,7 +905,6 @@ class Table {
                             {title: "Seg1 Fare Family", field: "in_seg2_fare_family"},
                             {title: "Seg1 Booking Class", field: "in_seg2_booking_class"},
                             {title: "Seg1 Fare Basis", field: "in_seg2_fare_basis_code"},
-                            
                             {title: "Seg1 Origin station code", field: "in_seg3_origin_station_code"},
                             {title: "Seg1 Dest station code", field: "in_seg3_destination_station_code"},
                             {title: "Seg1 Carrier", field: "in_seg3_carrier_code"},
@@ -867,54 +924,6 @@ class Table {
                         ]
                     },
                     {
-                        title: "OUT general",
-                        columns: [
-                            {title: "BPTD Departure", field: "out_BPTD_departure"},
-                            {title: "BPTS Departure", field: "out_BPTS_departure"},
-                            {title: "BPT Arrival", field: "out_BPT_arrival"},
-                            {title: "Duration", field: "out_duration"},
-                            {title: "Segments Count", field: "out_segments_count"},
-                            {title: "Legs Count", field: "out_legs_count"},
-                            {title: "Distance km", field: "out_distance_km"},
-                            {title: "Main Segment", field: "out_main_segment"},
-                            {title: "Origin Station Code", field: "out_origin_station_code"},
-                            {title: "Destination Station Code", field: "out_destination_station_code"},
-                            {title: "Cabin Class", field: "out_cabin_class"},
-                            {title: "Fare Family", field: "out_fare_family"},
-                            {title: "Booking Class", field: "out_booking_class"},
-                            {title: "Fare Basis Code", field: "out_fare_basis_code"},
-                            {title: "Fare exc", field: "out_fare_exc"},
-                            {title: "Fare inc", field: "out_fare_inc"},
-                            {title: "Taxes fees", field: "out_taxes_fees"},
-                            {title: "Fare exc USD", field: "out_fare_exc_usd"},
-                            {title: "Fare inc USD", field: "out_fare_inc_usd"},
-                        ]
-                    },
-                    {
-                        title: "IN General",
-                        columns: [
-                            {title: "BPTD Departure", field: "in_BPTD_departure"},
-                            {title: "BPTS Departure", field: "in_BPTS_departure"},
-                            {title: "BPT Arrival", field: "in_BPT_arrival"},
-                            {title: "Duration", field: "in_duration"},
-                            {title: "Segments Count", field: "in_segments_count"},
-                            {title: "Legs Count", field: "in_legs_count"},
-                            {title: "Distance km", field: "in_distance_km"},
-                            {title: "Main Segment", field: "in_main_segment"},
-                            {title: "Origin Station Code", field: "in_origin_station_code"},
-                            {title: "Destination Station Code", field: "in_destination_station_code"},
-                            {title: "Cabin Class", field: "in_cabin_class"},
-                            {title: "Fare Family", field: "in_fare_family"},
-                            {title: "Booking Class", field: "in_booking_class"},
-                            {title: "Fare Basis Code", field: "in_fare_basis_code"},
-                            {title: "Fare exc", field: "in_fare_exc"},
-                            {title: "Fare inc", field: "in_fare_inc"},
-                            {title: "Taxes fees", field: "in_taxes_fees"},
-                            {title: "Fare exc USD", field: "in_fare_exc_usd"},
-                            {title: "Fare inc USD", field: "in_fare_inc_usd"},
-                        ]
-                    },
-                    {
                         title: "Trip Data",
                         columns: [
                             {title: "Geodesic Distance km", field: "origin_destination_geodesic_distance_km"},
@@ -926,18 +935,28 @@ class Table {
                             {title: "Is Fare Basis Constructed Bitmask", field: "trip_is_fare_basis_constructed_bitmask"},
                             {title: "State ID", field: "trip_state_id"},
                             {title: "Fare exc", field: "trip_fare_exc"},
+                            {title: "Fare exc", field: "trip_fare_exc_x1000"},
                             {title: "Fare inc", field: "trip_fare_inc"},
+                            {title: "Fare inc", field: "trip_fare_inc_x1000"},
                             {title: "Taxes Fees", field: "trip_taxes_fees"},
+                            {title: "Taxes Fees", field: "trip_taxes_fees_x1000"},
                             {title: "Fee CreditCard", field: "trip_fee_creditcard"},
+                            {title: "Fee CreditCard", field: "trip_fee_creditcard_x1000"},
                             {title: "Fee YQ", field: "trip_fee_yq"},
+                            {title: "Fee YQ", field: "trip_fee_yq_x1000"},
                             {title: "Fee YR", field: "trip_fee_yr"},
+                            {title: "Fee YR", field: "trip_fee_yr_x1000"},
                             {title: "Fee Booking", field: "trip_fee_booking"},
+                            {title: "Fee Booking", field: "trip_fee_booking_x1000"},
                             {title: "Ancillaries Dict", field: "trip_ancilliaries_dictionary"},
                             {title: "Fare exc USD", field: "trip_fare_exc_usd"},
+                            {title: "Fare exc USD", field: "trip_fare_exc_usd_x1000"},
                             {title: "Fare inc USD", field: "trip_fare_inc_usd"},
+                            {title: "Fare inc USD", field: "trip_fare_inc_usd_x1000"},
                             {title: "Currency Code Fare", field: "currency_code_fare"},
                             {title: "Currency Code Taxes Fees", field: "currency_code_taxes_fees"},
                             {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd"},
+                            {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd_x1000000000"},
                             {title: "Currency Rate Fare Date BPTD", field: "currency_rate_fare_date_BPTD"},
                             {title: "BPT Inserted UTC", field: "bpt_inserted_utc"},
                             {title: "Passenger Count", field: "trip_passenger_count"},
@@ -977,20 +996,25 @@ class Table {
                             {title: "Location Code Type", field: "hotel_location_code_type"},
                             {title: "Observed Name", field: "hotel_observed_name"},
                             {title: "Observed Rating", field: "hotel_observed_rating"},
+                            {title: "Observed Rating", field: "hotel_observed_rating_x10"},
                             {title: "Observed Address", field: "hotel_observed_address"},
                             {title: "Observed Street", field: "hotel_observed_street"},
                             {title: "Observed City", field: "hotel_observed_city"},
                             {title: "Observed Region", field: "hotel_observed_region"},
                             {title: "Observed Postcode", field: "hotel_observed_postcode"},
                             {title: "Observed Latitude", field: "hotel_observed_latitude"},
+                            {title: "Observed Latitude", field: "hotel_observed_latitude_x1000000"},
                             {title: "Observed Longitude", field: "hotel_observed_longitude"},
+                            {title: "Observed Longitude", field: "hotel_observed_longitude_x1000000"},
                             {title: "Name Infare Key", field: "hotel_name_infare_key"},
                             {title: "Supplier ID", field: "hotel_supplier_id"},
                             {title: "Mapped ID", field: "hotel_mapped_id"},
                             {title: "Mapped Name", field: "hotel_mapped_name"},
                             {title: "Mapped Address", field: "hotel_mapped_address"},
-                            {title: "Mapped Longitude", field: "hotel_mapped_longitude"},
                             {title: "Mapped Latitude", field: "hotel_mapped_latitude"},
+                            {title: "Mapped Latitude", field: "hotel_mapped_latitude_x1000000"},
+                            {title: "Mapped Longitude", field: "hotel_mapped_longitude"},
+                            {title: "Mapped Longitude", field: "hotel_mapped_longitude_x1000000"},
                             {title: "Room Description", field: "hotel_room_description"},
                             {title: "Room Type", field: "hotel_room_type"},
                             {title: "Room Class", field: "hotel_room_class"},
@@ -1002,10 +1026,14 @@ class Table {
                             {title: "Is Refundable", field: "hotel_refundable"},
                             {title: "Payment Type", field: "hotel_payment_type"},
                             {title: "Rate exc", field: "hotel_rate_exc"},
+                            {title: "Rate exc", field: "hotel_rate_exc_x1000"},
                             {title: "Rate inc", field: "hotel_rate_inc"},
+                            {title: "Rate inc", field: "hotel_rate_inc_x1000"},
                             {title: "Taxes and fees", field: "hotel_taxes_fees"},
+                            {title: "Taxes and fees", field: "hotel_taxes_fees_x1000"},
                             {title: "Nightly rates dict", field: "hotel_nightly_rates_dictionary"},
                             {title: "Due fees", field: "hotel_due_fees"},
+                            {title: "Due fees", field: "hotel_due_fees_x1000"},
                             {title: "Due Fees currency", field: "hotel_due_fees_currency"},
                         ]
                     },
@@ -1030,17 +1058,24 @@ class Table {
                             {title: "Dropoff BPTS", field: "car_dropoff_bpts"},
                             {title: "Payment Type", field: "car_payment_type"},
                             {title: "Rate exc", field: "car_rate_exc"},
+                            {title: "Rate exc", field: "car_rate_exc_x1000"},
                             {title: "Rate inc", field: "car_rate_inc"},
+                            {title: "Rate inc", field: "car_rate_inc_x1000"},
                             {title: "Taxes and Fees", field: "car_taxes_fees"},
+                            {title: "Taxes and Fees", field: "car_taxes_fees_x1000"},
                         ]
                     },
                     {
                         title: "Package data",
                         columns: [
                             {title: "Price exc", field: "package_price_exc"},
+                            {title: "Price exc", field: "package_price_exc_x1000"},
                             {title: "Price inc", field: "package_price_inc"},
+                            {title: "Price inc", field: "package_price_inc_x1000"},
                             {title: "Taxes and Fees", field: "package_taxes_fees"},
+                            {title: "Taxes and Fees", field: "package_taxes_fees_x1000"},
                             {title: "Claimed Discount", field: "package_claimed_discount"},
+                            {title: "Claimed Discount", field: "package_claimed_discount_x1000"},
                             {title: "Special Offer Text", field: "package_special_offer_text"},
                         ]
                     },
@@ -1071,7 +1106,11 @@ class Table {
                 ]
             }
         };
-        
-        return Object.assign(templates.default, templates[this.type]);
+    
+        this.templates.valid = this.templates.invalid = this.templates.validInvalid;
+    }
+
+    getTableTemplate() {
+        return Object.assign(this.templates.default, this.templates[this.type]);
     }
 }

@@ -120,13 +120,13 @@ LEFT JOIN
 ON hotelGroupAndData.infare_hotel_id = mappedData.InfareHotelId
         """
 
-    elif action == 'valid':
+    elif action == 'valid' or action == 'invalid':
         search_criterias = " OR ".join(map(
             lambda row: f"search_criteria_rowid_array LIKE '%{row['subscription_line_id']}%'", data
         ))
         db_query = f"""
 SELECT *
-FROM [beclu4].[vacation_data_kafka].[dbo].[T_fare_observation_vac]
+FROM [beclu4].[vacation_data_kafka].[dbo].{'[T_fare_observation_vac]' if action == 'valid' else '[T_fare_observation_vac_invalid]'}
 WHERE
 	{search_criterias}
 
@@ -146,6 +146,6 @@ def controller(test_json=None):
 
     send_to_electron(table_data)
 
-test_json = '{"action":"stats","data":[]}'
+test_json = '{"action":"valid","data":[{"note_auto":null,"note_NB":null,"profile_id":"PD_FH","booking_site_id":2385,"subscription_line_id":260475,"run_date_utc":"2022-07-07","resolve_type":1,"valid":505,"invalid_all":2,"invalid_real":0,"room_error":0,"hotel_error":0,"flight_error":0,"unmapped":0,"tx_invalid":0,"tx_with_data":59,"tx_generated":61,"tx_generated_next":61,"unavailable_dates":2,"destination_error":0,"fhm_errors":0,"invalid2":2,"run_date_utc_next":"2022-07-11","end_run_datetime_utc":1657195200000,"end_date_proj":"2027-05-18","hotels_recognized":14,"hotels_specified_proj":null,"destination_user_input_proj":"","primary_subscription_line_id_proj":null,"collection_type":"FH","data_source_id":163,"pos":"CA","destination":"YTO","destination_type":2,"destination_user_input":"","adults":2,"children":0,"flight_origin":"YQT","flight_origin_type":1,"flight_searched_cabin":"E","flight_max_connections":2,"flight_carrier":null,"flight_arrival_requirement":null,"hotel_group_id":null,"hotels_specified":null,"hotel_count_to_collect":10,"hotel_room_options":1,"hotel_board_basis":0,"hotel_rating_filter":"2-5","car_offers_per_vendor":null,"car_vendor":null,"car_sipp_code":null,"car_discount_code":null,"car_pickup_time":null,"car_dropoff_time":null,"car_dropoff_location":null,"car_dropoff_location_type":null,"wildcard":null,"search_range_days":"0-60","search_range_anchor_date":null,"search_weekdays":127,"search_nights":3,"schedule_frequency_type":2,"schedule_frequency_interval":11,"schedule_frequency_interval_relative":null,"collection_schedule_id":249,"start_date":"2020-10-01","end_date":"2027-05-18","is_priority":false,"last_touched":1601473140150,"last_touched_by":"adam.boden@flyporter.com","note":null,"last_touched_NB":null,"last_touched_by_NB":null,"profileCity":"YTO","start_time":"00:00:00.0000000","allowed_runtime_minutes":480,"flight_included":true,"hotel_included":true,"car_included":false,"is_active_profile":true,"flight_matching":null,"hotel_matching":null,"primary_booking_site_id":null,"primary_subscription_line_id":null,"primary_run_date_utc":null,"primary_resolve_type":null,"primary_valid":null,"primary_invalid_all":null,"primary_room_error":null,"primary_hotel_error":null,"primary_flight_error":null,"primary_unmapped":null,"primary_tx_invalid":null,"primary_tx_with_data":null,"primary_tx_generated":null,"primary_unavailable_dates":null,"primary_destination_error":null,"primary_fhm_errors":null,"primary_invalid2":null,"primary_end_run_datetime_utc":null,"primary_hotels_recognized":null,"primary_hotels_specified_proj":null,"primary_destination_user_input_proj":null,"primary_end_date_proj":null,"primary_data_source_id":null,"primary_destination_user_input":null,"primary_flight_searched_cabin":null,"primary_flight_max_connections":null,"primary_flight_carrier":null,"primary_flight_arrival_requirement":null,"primary_wildcard":null,"primary_collection_schedule_id":null,"primary_start_date":null,"primary_end_date":null,"primary_is_priority":null,"primary_last_touched":null,"primary_last_touched_by":null,"primary_note":null,"primary_last_touched_NB":null,"primary_last_touched_by_NB":null,"primary_note_NB":null,"primary_start_time":null,"primary_allowed_runtime_minutes":null,"primary_is_active_profile":null,"begin_run_datetime_utc_diff":null,"key":"2385FH","min_begin_run_datetime_utc_diff":null,"relevant":1,"missing_tx":0}]}'
 
 controller()
