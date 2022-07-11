@@ -25,13 +25,22 @@ class Table {
     }
 
     async createTable(dataToSend) {
-        let tableTemplate = this.getTableTemplate();
-
         let tableData = await this.getDataFromDb(dataToSend);
 
-        tableTemplate.data = tableData;
+        this.template.data = tableData;
+
+        //{title: "POS", field: "pos", headerFilter: true}
+        // Add dctDebugDictionary columns
+        if (this.type === 'valid' || this.type === 'invalid') {          
+            let row = tableData[0];
+            for (const key of Object.keys(row)){
+                if (key.startsWith('ddd_')) {
+                    this.template.columns.find(x => x.title === 'Debug Dict').columns.push({title: key.slice(4), field: key, headerFilter: true});
+                }
+            }
+        }
         
-        this.table = new Tabulator(`#${this.tableId}`, tableTemplate);
+        this.table = new Tabulator(`#${this.tableId}`, this.template);
 
         // double left mouse click will select cell text for copying
         this.table.on('cellDblClick', (e, cell) => {
@@ -441,7 +450,7 @@ class Table {
     }
 
     _initTemplates() {
-        this.templates = {
+        let templates = {
     
             default: {
                 layout: "fitDataFill",
@@ -744,7 +753,7 @@ class Table {
                 ]
             },
     
-            validInvalid: {
+            validInvalid: type => { return {
                 rowFormatter: this.expandableRow,
                 paginationSize: 30,
     
@@ -756,6 +765,7 @@ class Table {
                     },
                     {title: "Queue Id", field: "scheduler_active_queue_id"},
                     {title: "Search Rank", field: "search_rank"},
+                    {title: "Debug Dict", columns: []},
                     {
                         title: "Time Found",
                         columns: [
@@ -780,16 +790,21 @@ class Table {
                             {title: "Fare Family", field: "out_fare_family"},
                             {title: "Booking Class", field: "out_booking_class"},
                             {title: "Fare Basis Code", field: "out_fare_basis_code"},
-                            {title: "Fare exc", field: "out_fare_exc"},
-                            {title: "Fare exc", field: "out_fare_exc_x1000"},
-                            {title: "Fare inc", field: "out_fare_inc"},
-                            {title: "Fare inc", field: "out_fare_inc_x1000"},
-                            {title: "Taxes fees", field: "out_taxes_fees"},
-                            {title: "Taxes fees", field: "out_taxes_fees_x1000"},
-                            {title: "Fare exc USD", field: "out_fare_exc_usd"},
-                            {title: "Fare exc USD", field: "out_fare_exc_usd_x1000"},
-                            {title: "Fare inc USD", field: "out_fare_inc_usd"},
-                            {title: "Fare inc USD", field: "out_fare_inc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc", field: "out_fare_exc"} :
+                            {title: "Fare exc x1000", field: "out_fare_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc", field: "out_fare_inc"} :
+                            {title: "Fare inc x1000", field: "out_fare_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes fees", field: "out_taxes_fees"} :
+                            {title: "Taxes fees x1000", field: "out_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc USD", field: "out_fare_exc_usd"} :
+                            {title: "Fare exc USD x1000", field: "out_fare_exc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc USD", field: "out_fare_inc_usd"} :
+                            {title: "Fare inc USD x1000", field: "out_fare_inc_usd_x1000"},
                         ]
                     },
                     {
@@ -862,16 +877,21 @@ class Table {
                             {title: "Fare Family", field: "in_fare_family"},
                             {title: "Booking Class", field: "in_booking_class"},
                             {title: "Fare Basis Code", field: "in_fare_basis_code"},
-                            {title: "Fare exc", field: "in_fare_exc"},
-                            {title: "Fare exc", field: "in_fare_exc_x1000"},
-                            {title: "Fare inc", field: "in_fare_inc"},
-                            {title: "Fare inc", field: "in_fare_inc_x1000"},
-                            {title: "Taxes fees", field: "in_taxes_fees"},
-                            {title: "Taxes fees", field: "in_taxes_fees_x1000"},
-                            {title: "Fare exc USD", field: "in_fare_exc_usd"},
-                            {title: "Fare exc USD", field: "in_fare_exc_usd_x1000"},
-                            {title: "Fare inc USD", field: "in_fare_inc_usd"},
-                            {title: "Fare inc USD", field: "in_fare_inc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc", field: "in_fare_exc"} :
+                            {title: "Fare exc x1000", field: "in_fare_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc", field: "in_fare_inc"} :
+                            {title: "Fare inc x1000", field: "in_fare_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes fees", field: "in_taxes_fees"} :
+                            {title: "Taxes fees x1000", field: "in_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc USD", field: "in_fare_exc_usd"} :
+                            {title: "Fare exc USD x1000", field: "in_fare_exc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc USD", field: "in_fare_inc_usd"} :
+                            {title: "Fare inc USD x1000", field: "in_fare_inc_usd_x1000"},
                         ]
                     },
                     {
@@ -938,29 +958,39 @@ class Table {
                             {title: "Is Domestic", field: "trip_is_domestic"},
                             {title: "Is Fare Basis Constructed Bitmask", field: "trip_is_fare_basis_constructed_bitmask"},
                             {title: "State ID", field: "trip_state_id"},
-                            {title: "Fare exc", field: "trip_fare_exc"},
-                            {title: "Fare exc", field: "trip_fare_exc_x1000"},
-                            {title: "Fare inc", field: "trip_fare_inc"},
-                            {title: "Fare inc", field: "trip_fare_inc_x1000"},
-                            {title: "Taxes Fees", field: "trip_taxes_fees"},
-                            {title: "Taxes Fees", field: "trip_taxes_fees_x1000"},
-                            {title: "Fee CreditCard", field: "trip_fee_creditcard"},
-                            {title: "Fee CreditCard", field: "trip_fee_creditcard_x1000"},
-                            {title: "Fee YQ", field: "trip_fee_yq"},
-                            {title: "Fee YQ", field: "trip_fee_yq_x1000"},
-                            {title: "Fee YR", field: "trip_fee_yr"},
-                            {title: "Fee YR", field: "trip_fee_yr_x1000"},
-                            {title: "Fee Booking", field: "trip_fee_booking"},
-                            {title: "Fee Booking", field: "trip_fee_booking_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc", field: "trip_fare_exc"} :
+                            {title: "Fare exc x1000", field: "trip_fare_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc", field: "trip_fare_inc"} :
+                            {title: "Fare inc x1000", field: "trip_fare_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes Fees", field: "trip_taxes_fees"} :
+                            {title: "Taxes Fees x1000", field: "trip_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Fee CreditCard", field: "trip_fee_creditcard"} :
+                            {title: "Fee CreditCard x1000", field: "trip_fee_creditcard_x1000"},
+                            type === "valid" ?
+                            {title: "Fee YQ", field: "trip_fee_yq"} :
+                            {title: "Fee YQ x1000", field: "trip_fee_yq_x1000"},
+                            type === "valid" ?
+                            {title: "Fee YR", field: "trip_fee_yr"} :
+                            {title: "Fee YR x1000", field: "trip_fee_yr_x1000"},
+                            type === "valid" ?
+                            {title: "Fee Booking", field: "trip_fee_booking"} :
+                            {title: "Fee Booking x1000", field: "trip_fee_booking_x1000"},
                             {title: "Ancillaries Dict", field: "trip_ancilliaries_dictionary"},
-                            {title: "Fare exc USD", field: "trip_fare_exc_usd"},
-                            {title: "Fare exc USD", field: "trip_fare_exc_usd_x1000"},
-                            {title: "Fare inc USD", field: "trip_fare_inc_usd"},
-                            {title: "Fare inc USD", field: "trip_fare_inc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare exc USD", field: "trip_fare_exc_usd"} :
+                            {title: "Fare exc USD x1000", field: "trip_fare_exc_usd_x1000"},
+                            type === "valid" ?
+                            {title: "Fare inc USD", field: "trip_fare_inc_usd"} :
+                            {title: "Fare inc USD x1000", field: "trip_fare_inc_usd_x1000"},
                             {title: "Currency Code Fare", field: "currency_code_fare"},
                             {title: "Currency Code Taxes Fees", field: "currency_code_taxes_fees"},
-                            {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd"},
-                            {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd_x1000000000"},
+                            type === "valid" ?
+                            {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd"} :
+                            {title: "Currency Rate Fate to USD x1000000000", field: "currency_rate_fare_to_usd_x1000000000"},
                             {title: "Currency Rate Fare Date BPTD", field: "currency_rate_fare_date_BPTD"},
                             {title: "BPT Inserted UTC", field: "bpt_inserted_utc"},
                             {title: "Passenger Count", field: "trip_passenger_count"},
@@ -999,26 +1029,31 @@ class Table {
                             {title: "Associaled Location Code", field: "hotel_associated_location_code"},
                             {title: "Location Code Type", field: "hotel_location_code_type"},
                             {title: "Observed Name", field: "hotel_observed_name"},
-                            {title: "Observed Rating", field: "hotel_observed_rating"},
-                            {title: "Observed Rating", field: "hotel_observed_rating_x10"},
+                            type === "valid" ?
+                            {title: "Observed Rating", field: "hotel_observed_rating"} :
+                            {title: "Observed Rating x10", field: "hotel_observed_rating_x10"},
                             {title: "Observed Address", field: "hotel_observed_address"},
                             {title: "Observed Street", field: "hotel_observed_street"},
                             {title: "Observed City", field: "hotel_observed_city"},
                             {title: "Observed Region", field: "hotel_observed_region"},
                             {title: "Observed Postcode", field: "hotel_observed_postcode"},
-                            {title: "Observed Latitude", field: "hotel_observed_latitude"},
-                            {title: "Observed Latitude", field: "hotel_observed_latitude_x1000000"},
-                            {title: "Observed Longitude", field: "hotel_observed_longitude"},
-                            {title: "Observed Longitude", field: "hotel_observed_longitude_x1000000"},
+                            type === "valid" ?
+                            {title: "Observed Latitude", field: "hotel_observed_latitude"} :
+                            {title: "Observed Latitude x1000000", field: "hotel_observed_latitude_x1000000"},
+                            type === "valid" ?
+                            {title: "Observed Longitude", field: "hotel_observed_longitude"} :
+                            {title: "Observed Longitude x1000000", field: "hotel_observed_longitude_x1000000"},
                             {title: "Name Infare Key", field: "hotel_name_infare_key"},
                             {title: "Supplier ID", field: "hotel_supplier_id"},
                             {title: "Mapped ID", field: "hotel_mapped_id"},
                             {title: "Mapped Name", field: "hotel_mapped_name"},
                             {title: "Mapped Address", field: "hotel_mapped_address"},
-                            {title: "Mapped Latitude", field: "hotel_mapped_latitude"},
-                            {title: "Mapped Latitude", field: "hotel_mapped_latitude_x1000000"},
-                            {title: "Mapped Longitude", field: "hotel_mapped_longitude"},
-                            {title: "Mapped Longitude", field: "hotel_mapped_longitude_x1000000"},
+                            type === "valid" ?
+                            {title: "Mapped Latitude", field: "hotel_mapped_latitude"} :
+                            {title: "Mapped Latitude x1000000", field: "hotel_mapped_latitude_x1000000"},
+                            type === "valid" ?
+                            {title: "Mapped Longitude", field: "hotel_mapped_longitude"} :
+                            {title: "Mapped Longitude x1000000", field: "hotel_mapped_longitude_x1000000"},
                             {title: "Room Description", field: "hotel_room_description"},
                             {title: "Room Type", field: "hotel_room_type"},
                             {title: "Room Class", field: "hotel_room_class"},
@@ -1029,15 +1064,19 @@ class Table {
                             {title: "Room Amenities", field: "hotel_room_amenities"},
                             {title: "Is Refundable", field: "hotel_refundable"},
                             {title: "Payment Type", field: "hotel_payment_type"},
-                            {title: "Rate exc", field: "hotel_rate_exc"},
-                            {title: "Rate exc", field: "hotel_rate_exc_x1000"},
-                            {title: "Rate inc", field: "hotel_rate_inc"},
-                            {title: "Rate inc", field: "hotel_rate_inc_x1000"},
-                            {title: "Taxes and fees", field: "hotel_taxes_fees"},
-                            {title: "Taxes and fees", field: "hotel_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Rate exc", field: "hotel_rate_exc"} :
+                            {title: "Rate exc x1000", field: "hotel_rate_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Rate inc", field: "hotel_rate_inc"} :
+                            {title: "Rate inc x1000", field: "hotel_rate_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes and fees", field: "hotel_taxes_fees"} :
+                            {title: "Taxes and fees x1000", field: "hotel_taxes_fees_x1000"},
                             {title: "Nightly rates dict", field: "hotel_nightly_rates_dictionary"},
-                            {title: "Due fees", field: "hotel_due_fees"},
-                            {title: "Due fees", field: "hotel_due_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Due fees", field: "hotel_due_fees"} :
+                            {title: "Due fees x1000", field: "hotel_due_fees_x1000"},
                             {title: "Due Fees currency", field: "hotel_due_fees_currency"},
                         ]
                     },
@@ -1061,25 +1100,32 @@ class Table {
                             {title: "Dropoff BPTD", field: "car_dropoff_bptd"},
                             {title: "Dropoff BPTS", field: "car_dropoff_bpts"},
                             {title: "Payment Type", field: "car_payment_type"},
-                            {title: "Rate exc", field: "car_rate_exc"},
-                            {title: "Rate exc", field: "car_rate_exc_x1000"},
-                            {title: "Rate inc", field: "car_rate_inc"},
-                            {title: "Rate inc", field: "car_rate_inc_x1000"},
-                            {title: "Taxes and Fees", field: "car_taxes_fees"},
-                            {title: "Taxes and Fees", field: "car_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Rate exc", field: "car_rate_exc"} :
+                            {title: "Rate exc x1000", field: "car_rate_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Rate inc", field: "car_rate_inc"} :
+                            {title: "Rate inc x1000", field: "car_rate_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes and Fees", field: "car_taxes_fees"} :
+                            {title: "Taxes and Fees x1000", field: "car_taxes_fees_x1000"},
                         ]
                     },
                     {
                         title: "Package data",
                         columns: [
-                            {title: "Price exc", field: "package_price_exc"},
-                            {title: "Price exc", field: "package_price_exc_x1000"},
-                            {title: "Price inc", field: "package_price_inc"},
-                            {title: "Price inc", field: "package_price_inc_x1000"},
-                            {title: "Taxes and Fees", field: "package_taxes_fees"},
-                            {title: "Taxes and Fees", field: "package_taxes_fees_x1000"},
-                            {title: "Claimed Discount", field: "package_claimed_discount"},
-                            {title: "Claimed Discount", field: "package_claimed_discount_x1000"},
+                            type === "valid" ?
+                            {title: "Price exc", field: "package_price_exc"} :
+                            {title: "Price exc x1000", field: "package_price_exc_x1000"},
+                            type === "valid" ?
+                            {title: "Price inc", field: "package_price_inc"} :
+                            {title: "Price inc x1000", field: "package_price_inc_x1000"},
+                            type === "valid" ?
+                            {title: "Taxes and Fees", field: "package_taxes_fees"} :
+                            {title: "Taxes and Fees x1000", field: "package_taxes_fees_x1000"},
+                            type === "valid" ?
+                            {title: "Claimed Discount", field: "package_claimed_discount"} :
+                            {title: "Claimed Discount x1000", field: "package_claimed_discount_x1000"},
                             {title: "Special Offer Text", field: "package_special_offer_text"},
                         ]
                     },
@@ -1108,13 +1154,13 @@ class Table {
                         ]
                     },
                 ]
-            }
+            }}
         };
-    
-        this.templates.valid = this.templates.invalid = this.templates.validInvalid;
-    }
-
-    getTableTemplate() {
-        return Object.assign(this.templates.default, this.templates[this.type]);
+        
+        if (this.type === "valid" || this.type === "invalid") {
+            this.template = Object.assign(templates.default, templates.validInvalid(this.type));
+        } else {
+            this.template = Object.assign(templates.default, templates[this.type]);
+        }
     }
 }
