@@ -224,7 +224,6 @@ class Table {
 
         let expandableDataContainer = document.createElement('div');
         expandableDataContainer.classList.add('data-container');
-        expandableDataContainer.classList.add('tabulator-responsive-collapse');
         rowElement.appendChild(expandableDataContainer);
     }
 
@@ -401,7 +400,12 @@ class Table {
 
     formatUnixTime(cell) {
         let unixTime = cell.getValue();
-        return unixTime ? new Date(unixTime).toISOString().replace('T', ' ').replace('Z', '') : null;
+        let dateTimeString;
+        if (unixTime !== null && typeof unixTime === 'number') {
+            dateTimeString = new Date(unixTime).toISOString().replace('T', ' ').replace('Z', '');
+            cell.setValue(dateTimeString);
+        }
+        return dateTimeString;
     }
 
     getTableOptions(option) {
@@ -602,7 +606,7 @@ class Table {
                             {title: "Start time", field: "start_time"},
                             {title: "Begin run datetime utc", field: "begin_run_datetime_utc_diff", formatter: this.formatUnixTime},
                             {title: "Min begin run datetime utc", field: "min_begin_run_datetime_utc_diff"},
-                            {title: "End run datetime utc", field: "end_run_datetime_utc"},
+                            {title: "End run datetime utc", field: "end_run_datetime_utc", formatter: this.formatUnixTime},
                             {title: "Allowed runtime minutes", field: "allowed_runtime_minutes"},
                             {title: "Run date utc next", field: "run_date_utc_next"},
                             {title: "Tx generated next", field: "tx_generated_next"},
