@@ -649,6 +649,7 @@ class Table {
                     {title: "Wildcard", field: "wildcard"},
                     {
                         title: "Search Range",
+                        visible: false,
                         columns: [
                             {title: "Search range days", field: "search_range_days"},
                             {title: "Search range anchor date", field: "search_range_anchor_date"},
@@ -658,6 +659,7 @@ class Table {
                     },
                     {
                         title: "Schedule",
+                        visible: false,
                         columns: [
                             {title: "Schedule frequency type", field: "schedule_frequency_type"},
                             {title: "Schedule frequency interval", field: "schedule_frequency_interval"},
@@ -677,6 +679,7 @@ class Table {
                     },
                     {
                         title: "Notes",
+                        visible: false,
                         columns: [
                             {title: "Note", field: "note"},
                             {title: "Note auto", field: "note_auto"},
@@ -689,6 +692,7 @@ class Table {
                     },
                     {
                         title: "FHM Primary",
+                        visible: false,
                         columns: [
                             {title: "Flight matching", field: "flight_matching"},
                             {title: "Hotel matching", field: "hotel_matching"},
@@ -739,6 +743,7 @@ class Table {
                     },
                     {
                         title: "Data",
+                        visible: false,
                         columns: [
                             {title: "Booking site id", field: "booking_site_id"},
                             {title: "Data source id", field: "data_source_id"},
@@ -829,6 +834,7 @@ class Table {
                     },
                     {
                         title: "OUT general",
+                        visible: false,
                         columns: [
                             {title: "BPTD Departure", field: "out_BPTD_departure"},
                             {title: "BPTS Departure", field: "out_BPTS_departure"},
@@ -863,6 +869,7 @@ class Table {
                     },
                     {
                         title: "OUT flight data",
+                        visible: false,
                         columns: [
                             {title: "Seg1 Origin station code", field: "out_seg1_origin_station_code"},
                             {title: "Seg1 Dest station code", field: "out_seg1_destination_station_code"},
@@ -916,6 +923,7 @@ class Table {
                     },
                     {
                         title: "IN General",
+                        visible: false,
                         columns: [
                             {title: "BPTD Departure", field: "in_BPTD_departure"},
                             {title: "BPTS Departure", field: "in_BPTS_departure"},
@@ -950,6 +958,7 @@ class Table {
                     },
                     {
                         title: "IN flight data",
+                        visible: false,
                         columns: [
                             {title: "Seg1 Origin station code", field: "in_seg1_origin_station_code"},
                             {title: "Seg1 Dest station code", field: "in_seg1_destination_station_code"},
@@ -1003,6 +1012,7 @@ class Table {
                     },
                     {
                         title: "Trip Data",
+                        visible: false,
                         columns: [
                             {title: "Geodesic Distance km", field: "origin_destination_geodesic_distance_km"},
                             {title: "Point Of Sale", field: "trip_point_of_sale"},
@@ -1056,6 +1066,7 @@ class Table {
                     },
                     {
                         title: "Others",
+                        visible: false,
                         columns: [
                             {title: "DFS Custom dict", field: "dfs_custom_dictionary"},
                             {title: "Found URL", field: "found_url"},
@@ -1074,6 +1085,7 @@ class Table {
                     },
                     {
                         title: "Hotel Data",
+                        visible: false,
                         columns: [
                             {title: "Hotel included", field: "hotel_is_included"},
                             {title: "Rating Searched", field: "hotel_rating_searched"},
@@ -1136,6 +1148,7 @@ class Table {
                     },
                     {
                         title: "Car Data",
+                        visible: false,
                         columns: [
                             {title: "Car Included", field: "car_is_included"},
                             {title: "Rental Company", field: "car_rental_company"},
@@ -1167,6 +1180,7 @@ class Table {
                     },
                     {
                         title: "Package data",
+                        visible: false,
                         columns: [
                             type === "valid" ?
                             {title: "Price exc", field: "package_price_exc"} :
@@ -1185,6 +1199,7 @@ class Table {
                     },
                     {
                         title: "Subline",
+                        visible: false,
                         columns: [
                             {title: "Adults", field: "adults"},
                             {title: "Children", field: "children"},
@@ -1198,6 +1213,7 @@ class Table {
                     },
                     {
                         title: "Tx data",
+                        visible: false,
                         columns: [
                             {title: "Partition Number", field: "partition_number"},
                             {title: "Data collection Type ID", field: "data_collection_type_id"},
