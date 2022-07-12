@@ -417,6 +417,60 @@ class Table {
         return dateTimeString;
     }
 
+    headerMenu() {
+        let menu = [];
+        const columns = this.getColumns();
+        let addedColumnTitles = [];
+    
+        for(let column of columns){
+
+            if (column.getParentColumn()) {
+                column = column.getParentColumn()
+            }
+
+            const columnTitle = column.getDefinition().title;
+            if (addedColumnTitles.includes(columnTitle)) {
+                continue;
+            }
+
+            addedColumnTitles.push(columnTitle);
+    
+            //build label
+            let label = document.createElement("div");
+            let title = document.createElement("span");
+
+            label.classList.add('column-name-popup');
+            if (!column.isVisible()) {
+                label.classList.add('hidden');
+            }
+    
+            title.textContent = columnTitle;
+    
+            label.appendChild(title);
+    
+            //create menu item
+            menu.push({
+                label:label,
+                action:function(e){
+                    //prevent menu closing
+                    e.stopPropagation();
+    
+                    //toggle current column visibility
+                    column.toggle();
+    
+                    //change menu item icon
+                    if (column.isVisible()) {
+                        label.classList.remove('hidden');
+                    } else {
+                        label.classList.add('hidden');
+                    }
+                }
+            });
+        }
+    
+       return menu;
+    }
+
     getTableOptions(option) {
         let options = {
             stats: {
@@ -467,15 +521,15 @@ class Table {
                         formatter: this.openNextIcon, formatterParams: () => {return 'subs'}, 
                         hozAlign:"center", headerSort:false, headerVertical:true
                     },
-                    {title: "Prio", field: "prio"},
-                    {title: "Booking site", field: "booking_site", headerFilter: true},
-                    {title: "BS Id", field: "bs_id", headerFilter: true},
+                    {title: "Prio", field: "prio", headerMenu: this.headerMenu},
+                    {title: "Booking site", field: "booking_site", headerFilter: true, headerMenu: this.headerMenu},
+                    {title: "BS Id", field: "bs_id", headerFilter: true, headerMenu: this.headerMenu},
                     {
                         title: "Type", field: "type", 
                         headerFilter: true, headerFilterFunc : "="
                     },
                     {title: "Code", field: "code"},
-                    {title: "Filter id", field: "filter_id"},
+                    {title: "Filter id", field: "filter_id", headerMenu: this.headerMenu},
                     {title: "Subs", field: "subs"},
                     {title: "Dest err", field: "d_err"},
                     {title: "no resolution", field: "no_res"},
@@ -520,11 +574,11 @@ class Table {
                         titleFormatter: this.sendNotes,
                         hozAlign:"center", headerSort:false, headerVertical:true
                     },
-                    {title: "Relevant", field: "relevant", headerVertical:true},
-                    {title: "Resolve Type", field: "resolve_type", headerVertical:true},
-                    {title: "Subline", field: "subscription_line_id", headerFilter: true},
-                    {title: "Last Run", field: "run_date_utc", headerFilter: true},
-                    {title: "Profile", field: "profile_id", headerFilter: true},
+                    {title: "Relevant", field: "relevant", headerVertical:true, headerMenu: this.headerMenu},
+                    {title: "Resolve Type", field: "resolve_type", headerVertical:true, headerMenu: this.headerMenu},
+                    {title: "Subline", field: "subscription_line_id", headerFilter: true, headerMenu: this.headerMenu},
+                    {title: "Last Run", field: "run_date_utc", headerFilter: true, headerMenu: this.headerMenu},
+                    {title: "Profile", field: "profile_id", headerFilter: true, headerMenu: this.headerMenu},
                     {title: "valid", field: "valid", headerFilter: true, headerFilterFunc : "="},
                     {title: "invalid all", field: "invalid_all"},
                     {title: "invalid real", field: "invalid_real"},
