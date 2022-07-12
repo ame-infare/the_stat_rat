@@ -29,7 +29,6 @@ class Table {
 
         this.template.data = tableData;
 
-        //{title: "POS", field: "pos", headerFilter: true}
         // Add dctDebugDictionary columns
         if (this.type === 'valid' || this.type === 'invalid') {          
             let row = tableData[0];
@@ -61,6 +60,7 @@ class Table {
 
         this.addColumnsAsOptionsForFilterButton();
         this.setupRowSelection();
+        this.toggleInvisibleColumnGroups(); //they do not change visibility because framework..
     }
 
     async getDataFromDb(dataToSend) {
@@ -118,6 +118,18 @@ class Table {
                 });
 
                 this.off('tableBuilt');
+            }
+        });
+    }
+
+    toggleInvisibleColumnGroups() {
+        this.table.on('tableBuilt', function() {
+            let columns = this.getColumns();
+            for (const column of columns) {
+                let parentCol = column.getParentColumn();
+                if (parentCol && parentCol.getDefinition().visible === false && parentCol.isVisible()) {
+                    parentCol.toggle();
+                }
             }
         });
     }
@@ -458,7 +470,7 @@ class Table {
                     //toggle current column visibility
                     column.toggle();
     
-                    //change menu item icon
+                    //change menu colors
                     if (column.isVisible()) {
                         label.classList.remove('hidden');
                     } else {
@@ -512,6 +524,9 @@ class Table {
                 selectable: true,
                 pagination: true,
                 paginationSize: 100,
+                columnDefaults: {
+                    headerMenu: this.headerMenu,
+                }
             },
     
             stats: {   
@@ -521,15 +536,15 @@ class Table {
                         formatter: this.openNextIcon, formatterParams: () => {return 'subs'}, 
                         hozAlign:"center", headerSort:false, headerVertical:true
                     },
-                    {title: "Prio", field: "prio", headerMenu: this.headerMenu},
-                    {title: "Booking site", field: "booking_site", headerFilter: true, headerMenu: this.headerMenu},
-                    {title: "BS Id", field: "bs_id", headerFilter: true, headerMenu: this.headerMenu},
+                    {title: "Prio", field: "prio"},
+                    {title: "Booking site", field: "booking_site", headerFilter: true},
+                    {title: "BS Id", field: "bs_id", headerFilter: true},
                     {
                         title: "Type", field: "type", 
                         headerFilter: true, headerFilterFunc : "="
                     },
                     {title: "Code", field: "code"},
-                    {title: "Filter id", field: "filter_id", headerMenu: this.headerMenu},
+                    {title: "Filter id", field: "filter_id"},
                     {title: "Subs", field: "subs"},
                     {title: "Dest err", field: "d_err"},
                     {title: "no resolution", field: "no_res"},
@@ -574,11 +589,11 @@ class Table {
                         titleFormatter: this.sendNotes,
                         hozAlign:"center", headerSort:false, headerVertical:true
                     },
-                    {title: "Relevant", field: "relevant", headerVertical:true, headerMenu: this.headerMenu},
-                    {title: "Resolve Type", field: "resolve_type", headerVertical:true, headerMenu: this.headerMenu},
-                    {title: "Subline", field: "subscription_line_id", headerFilter: true, headerMenu: this.headerMenu},
-                    {title: "Last Run", field: "run_date_utc", headerFilter: true, headerMenu: this.headerMenu},
-                    {title: "Profile", field: "profile_id", headerFilter: true, headerMenu: this.headerMenu},
+                    {title: "Relevant", field: "relevant", headerVertical:true},
+                    {title: "Resolve Type", field: "resolve_type", headerVertical:true},
+                    {title: "Subline", field: "subscription_line_id", headerFilter: true},
+                    {title: "Last Run", field: "run_date_utc", headerFilter: true},
+                    {title: "Profile", field: "profile_id", headerFilter: true},
                     {title: "valid", field: "valid", headerFilter: true, headerFilterFunc : "="},
                     {title: "invalid all", field: "invalid_all"},
                     {title: "invalid real", field: "invalid_real"},
