@@ -588,6 +588,9 @@ class Table {
     
             subs: {
                 rowFormatter: this.expandableRow,
+                initialHeaderFilter: [
+                    {field: 'relevant', value: 1}
+                ],
     
                 columns:[
                     {
@@ -611,7 +614,10 @@ class Table {
                         titleFormatter: this.sendNotes,
                         hozAlign:"center", headerSort:false, headerVertical: true
                     },
-                    {title: "Relevant", field: "relevant", headerVertical: true},
+                    {
+                        title: "Relevant", field: "relevant", headerVertical: true,
+                        headerFilter:"input"
+                    },
                     {title: "Resolve Type", field: "resolve_type", headerVertical: true},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
