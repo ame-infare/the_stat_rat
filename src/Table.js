@@ -45,26 +45,7 @@ class Table {
         
         this.table = new Tabulator(`#${this.tableId}`, this.template);
 
-        // double left mouse click will select cell text for copying
-        this.table.on('cellDblClick', (e, cell) => {
-            let cellElement = cell.getElement();
-
-            if (document.body.createTextRange) {
-                const range = document.body.createTextRange();
-                range.moveToElementText(cellElement);
-                range.select();
-            } else if (window.getSelection) {
-                const selection = window.getSelection();
-                const range = document.createRange();
-                range.selectNodeContents(cellElement);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        });
-
-        this.addColumnsAsOptionsForFilterButton();
-        this.setupRowSelection();
-        this.toggleInvisibleColumnGroups(); //they do not change visibility because framework..
+        this.finalSetup();
     }
 
     async getDataFromDb(dataToSend) {
@@ -142,7 +123,33 @@ class Table {
 
         this.table.on('tableBuilt', (tableBuilt) => {tableBuilt = true;});
     }
-              
+    
+    finalSetup() {      
+        this.mouseDoubleClick();
+        this.addColumnsAsOptionsForFilterButton();
+        this.setupRowSelection();
+        this.toggleInvisibleColumnGroups(); //they do not change visibility because framework..
+    }
+
+    mouseDoubleClick() {
+        // double left mouse click will select cell text for copying
+        this.table.on('cellDblClick', (e, cell) => {
+            let cellElement = cell.getElement();
+
+            if (document.body.createTextRange) {
+                const range = document.body.createTextRange();
+                range.moveToElementText(cellElement);
+                range.select();
+            } else if (window.getSelection) {
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(cellElement);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        });
+    }
+
     toggleIcons(icons) {
         icons.forEach(icon => {
             icon.classList.contains('active') ? icon.classList.remove('active') : icon.classList.add('active');
@@ -549,7 +556,7 @@ class Table {
                     {
                         title: "SUBLINES",
                         formatter: this.openNextIcon, formatterParams: () => {return 'subs'}, 
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
                     {title: "Prio", field: "prio"},
                     {title: "Booking site", field: "booking_site", headerFilter: true},
@@ -586,26 +593,26 @@ class Table {
                     {
                         title: "EXPAND",
                         formatter: this.expandRow, formatterParams: () => {return this},
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
                     {
                         title: "TRANSACTIONS",
                         formatter: this.openNextIcon, formatterParams: () => {return 'tx'},
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
                     {
                         title: "HOTELS",
                         formatter: this.hotelsIcon, 
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
                     {
                         title: "NOTE", field: "add_note",
                         formatter: this.addNote, formatterParams: () => {return this},
                         titleFormatter: this.sendNotes,
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
-                    {title: "Relevant", field: "relevant", headerVertical:true},
-                    {title: "Resolve Type", field: "resolve_type", headerVertical:true},
+                    {title: "Relevant", field: "relevant", headerVertical: true},
+                    {title: "Resolve Type", field: "resolve_type", headerVertical: true},
                     {title: "Subline", field: "subscription_line_id", headerFilter: true},
                     {title: "Last Run", field: "run_date_utc", headerFilter: true},
                     {title: "Profile", field: "profile_id", headerFilter: true},
@@ -850,7 +857,7 @@ class Table {
                     {
                         title: "EXPAND",
                         formatter: this.expandRow, formatterParams: () => {return this},
-                        hozAlign:"center", headerSort:false, headerVertical:true
+                        hozAlign:"center", headerSort:false, headerVertical: true
                     },
                     {title: "Queue Id", field: "scheduler_active_queue_id"},
                     {title: "Search Rank", field: "search_rank"},
