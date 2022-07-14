@@ -27,6 +27,10 @@ class Table {
     async createTable(dataToSend) {
         let tableData = await this.getDataFromDb(dataToSend);
 
+        if (tableData.length === 0) {
+            return;
+        }
+
         this.template.data = tableData;
 
         // Add dctDebugDictionary columns
@@ -117,21 +121,26 @@ class Table {
                     }
                 });
 
-                this.off('tableBuilt');
+                //this.table.off('tableBuilt');
             }
         });
     }
 
     toggleInvisibleColumnGroups() {
-        this.table.on('tableBuilt', function() {
-            let columns = this.getColumns();
-            for (const column of columns) {
-                let parentCol = column.getParentColumn();
-                if (parentCol && parentCol.getDefinition().visible === false && parentCol.isVisible()) {
-                    parentCol.toggle();
-                }
+        let updatedColumns = [];
+        let tableBuilt = false;
+ 
+        const updateColumnGroupVisibility = (column) => {
+            let columnDefinition = column.getDefinition();
+            if (!tableBuilt && !updatedColumns.includes(columnDefinition.title) && columnDefinition.visible === false) {
+                updatedColumns.push(columnDefinition.title);
+                column.toggle();
             }
-        });
+        }
+        
+        this.table.on("columnVisibilityChanged", updateColumnGroupVisibility);
+
+        this.table.on('tableBuilt', (tableBuilt) => {tableBuilt = true;});
     }
               
     toggleIcons(icons) {
@@ -472,6 +481,12 @@ class Table {
     
                     //change menu colors
                     if (column.isVisible()) {
+                        //resize subcolumns
+                        let childrenColumns = column.getSubColumns();
+                        if (childrenColumns.length > 0) {
+                            childrenColumns.forEach(x => x.setWidth(true));
+                        }
+
                         label.classList.remove('hidden');
                     } else {
                         label.classList.add('hidden');
