@@ -505,6 +505,43 @@ class Table {
        return menu;
     }
 
+    statsFormatter(cell) {
+        let columnName = cell.getColumn().getDefinition().field;
+        let cellValue = cell.getValue();
+
+        function makeRed(value) {
+            let element = document.createElement('div');
+            element.innerText = value;
+            element.style.color = "white";
+            element.style.fontWeight = "bold";
+            element.style.backgroundColor = "rgba(220,20,60,0.6)";
+            return element;
+        }
+
+        if (columnName === 'd_err') {
+            return cellValue > 0 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === 'no_res') {
+            return cellValue ? makeRed(cellValue) : cellValue;
+        } else if (columnName === '%miss') {
+            return cellValue > 4 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === 'sub_mis') {
+            return cellValue > 4 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === '%inv') {
+            return cellValue > 4 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === 'tx_inv') {
+            let txInvPc = cell.getData()['%tx_inv'];
+            return cellValue > 20 && txInvPc > 1 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === '%tx_inv') {
+            let txInv = cell.getData()['tx_inv'];
+            return cellValue > 1 && txInv > 20 ? makeRed(cellValue) : cellValue;
+        } else if (columnName === '%tx_miss') {
+            let limit = cell.getData()['%tx_limit'];
+            return cellValue - limit > 15 ? makeRed(cellValue) : cellValue;
+        }
+
+        return cellValue;
+    }
+
     getTableOptions(option) {
         let options = {
             stats: {
@@ -568,15 +605,15 @@ class Table {
                     {title: "Code", field: "code"},
                     {title: "Filter id", field: "filter_id"},
                     {title: "Subs", field: "subs"},
-                    {title: "Dest err", field: "d_err"},
-                    {title: "no resolution", field: "no_res"},
-                    {title: "Subs miss", field: "sub_mis"},
-                    {title: "%miss", field: "%miss"},
+                    {title: "Dest err", field: "d_err", formatter: this.statsFormatter},
+                    {title: "no resolution", field: "no_res", formatter: this.statsFormatter},
+                    {title: "Subs miss", field: "sub_mis", formatter: this.statsFormatter},
+                    {title: "%miss", field: "%miss", formatter: this.statsFormatter},
                     {title: "Valid", field: "valid"},
-                    {title: "%inv", field: "%inv"},
-                    {title: "tx_inv", field: "tx_inv"},
-                    {title: "%tx_inv", field: "%tx_inv"},
-                    {title: "%tx_miss", field: "%tx_miss"},
+                    {title: "%inv", field: "%inv", formatter: this.statsFormatter},
+                    {title: "tx_inv", field: "tx_inv", formatter: this.statsFormatter},
+                    {title: "%tx_inv", field: "%tx_inv", formatter: this.statsFormatter},
+                    {title: "%tx_miss", field: "%tx_miss", formatter: this.statsFormatter},
                     {title: "%tx_limit", field: "%tx_limit"},
                     {
                         title: "Issue date", field: "issue_date",
