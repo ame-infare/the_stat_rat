@@ -122,6 +122,27 @@ async function setupButtons(elementId, newWindowTemplate) {
         });
     }
 
+    // Setting up Copy sublines button
+    const copySubs = newWindowTemplate.querySelector('.copy-subs');
+    if (copySubs) {
+        function copySubsToClipboard(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            const selectedSubs = allTables[elementId].selectedRows.map(x => x.getData().subscription_line_id);
+            const sublinesString = `"${selectedSubs.join('", "')}"`;
+            navigator.clipboard.writeText(sublinesString);
+        }
+
+        copySubs.addEventListener('click', copySubsToClipboard);
+
+        // document.onkeyup = e => {
+        //     const window = document.getElementById(`${elementId}-window`);
+        //     if (window.classList.contains('active') && e.ctrlKey && e.which === 83) {
+        //         copySubsToClipboard(e);
+        //     }
+        // }
+    }
+
     //handling filter form button
     const filterForm = newWindowTemplate.querySelector('.filter-button form');
     if (filterForm) {
@@ -134,7 +155,7 @@ async function setupButtons(elementId, newWindowTemplate) {
         filterForm.appendChild(inputEl);
 
         // filter button functionality
-        filterForm.addEventListener('submit', function (event) {
+        filterForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
             let columnName = event.target.elements.columns.value;

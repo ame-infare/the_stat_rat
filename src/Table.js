@@ -551,7 +551,7 @@ class Table {
             subs: {
                 tabNameDataKeys: ['booking_site', 'key'],
                 loadSelectedNextPageName: 'tx',
-                buttons: ['load-selected', 'filter-button', 'valid', 'invalid']
+                buttons: ['load-selected', 'filter-button', 'valid', 'invalid', 'copy-subs']
             },
             tx: {
                 tabNameDataKeys: ['subscription_line_id', 'key'],
