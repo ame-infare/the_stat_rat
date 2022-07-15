@@ -6,15 +6,26 @@
 
 body {
     background-color: var(--background-color);
+
+    position: relative;
+    height: 97vh;
+
+    margin: 0;
+    padding: 8px;
+
+    display: flex;
+    flex-direction: column;
 }
 
 #nav {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
 
     background-color: var(--background-color);
+
+    display: flex;
+    flex-wrap: wrap;
 }
 
 #nav li {
@@ -40,6 +51,8 @@ body {
     box-shadow: -1px -1px 1px var(--tab-light-color);
 
     transition: 0.1s;
+
+    max-height: 2em;
 }
 
 #nav li:hover {
@@ -71,8 +84,8 @@ body {
 }
 
 #windows-container {
+    height: 100%;
     position: relative;
-    height: 800px;
 }
 
 .window {
@@ -248,22 +261,4 @@ body {
 }
 .not-bookable input {
     margin: 5px;
-}
-
-/* tabulator menu to toggle columns */
-.tabulator-menu {
-    display: flex;
-    flex-wrap: wrap;
-    writing-mode: vertical-lr;
-    text-orientation: upright;
-
-    height: 600px;
-    max-height: max-content;
-}
-.tabulator-menu * {
-    writing-mode: horizontal-tb;
-}
-.column-name-popup.hidden {
-    background-color: #c78a8a;
-    color: white;
 }
