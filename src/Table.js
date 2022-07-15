@@ -435,14 +435,67 @@ class Table {
         return sendNotesButton;
     }
 
-    formatUnixTime(cell) {
-        let unixTime = cell.getValue();
-        let dateTimeString;
-        if (unixTime !== null && typeof unixTime === 'number') {
-            dateTimeString = new Date(unixTime).toISOString().replace('T', ' ').replace('Z', '');
-            cell.setValue(dateTimeString);
+    formatDateToString(date, formatDate, formatTime) {
+        const month = date.getMonth();
+        const day = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getSeconds();
+
+        let dateAndTimeStrings = [];
+
+        if (formatDate) {
+            dateAndTimeStrings.push(`${date.getFullYear()}-${(month.toString().length == 1 ? '0' : '') + (month + 1)}-${(day.toString().length == 1 ? '0' : '') + day}`);
         }
-        return dateTimeString;
+        if (formatTime) {
+            dateAndTimeStrings.push(`${(hours.toString().length == 1 ? '0' : '') + hours}:${(minutes.toString().length == 1 ? '0' : '') + minutes}:${(seconds.toString().length == 1 ? '0' : '') + seconds}`);
+        }
+
+        return dateAndTimeStrings.join(' ');
+    }
+
+    formatUnixTime(cell, formatDateToString) {
+        let unixTime = cell.getValue();
+        if (unixTime !== null) {
+            return formatDateToString(new Date(unixTime), true, true);
+        }
+        
+        return unixTime;
+    }
+
+    formatBPTTime(cell, formatDateToString) {
+        let cellValueBPT = cell.getValue();
+        const numOfDigits = cellValueBPT ? cellValueBPT.toString().length : 0;
+
+        const getDate = function(BPTD) {
+            let date = new Date(Date.UTC(2000, 0));
+            date.setDate(date.getDate() + BPTD);
+            return date
+        }
+
+        const getTime = function(BPTS) {
+            let hours = Math.floor(BPTS / 3600);
+            let totalSeconds = BPTS % 3600;
+            let minutes = Math.floor(totalSeconds / 60);
+            let seconds = totalSeconds % 60;
+            return `${(hours.toString().length == 1 ? '0' : '') + hours}:${(minutes.toString().length == 1 ? '0' : '') + minutes}:${(seconds.toString().length == 1 ? '0' : '') + seconds}`;
+        }
+
+        if (numOfDigits === 4) { // BPTD only date
+            let date = getDate(cellValueBPT);
+            return formatDateToString(date, true, false);
+        } else if (numOfDigits === 5) {
+            return getTime(cellValueBPT);
+        } else if (numOfDigits === 9) {
+            let BPTD = Math.floor(cellValueBPT / 100000);
+            let BPTS = cellValueBPT % 100000;
+            let date = getDate(BPTD);
+            let dateString = formatDateToString(date, true, false);
+            let timeString = getTime(BPTS);
+            return `${dateString} ${timeString}`;
+        }
+
+        return cellValueBPT;
     }
 
     headerMenu() {
@@ -616,7 +669,7 @@ class Table {
                     {title: "%tx_limit", field: "%tx_limit"},
                     {
                         title: "Issue date", field: "issue_date",
-                        formatter: this.formatUnixTime
+                        formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
                     },
                     {title: "Aff profiles", field: "affected_profiles"},
                 ]
@@ -748,9 +801,12 @@ class Table {
                             {title: "End date", field: "end_date"},
                             {title: "End date proj", field: "end_date_proj"},
                             {title: "Start time", field: "start_time"},
-                            {title: "Begin run datetime utc", field: "begin_run_datetime_utc_diff", formatter: this.formatUnixTime},
+                            {title: "Begin run datetime utc diff", field: "begin_run_datetime_utc_diff"},
                             {title: "Min begin run datetime utc", field: "min_begin_run_datetime_utc_diff"},
-                            {title: "End run datetime utc", field: "end_run_datetime_utc", formatter: this.formatUnixTime},
+                            {
+                                title: "End run datetime utc", field: "end_run_datetime_utc",
+                                formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Allowed runtime minutes", field: "allowed_runtime_minutes"},
                             {title: "Run date utc next", field: "run_date_utc_next"},
                             {title: "Tx generated next", field: "tx_generated_next"},
@@ -765,7 +821,10 @@ class Table {
                             {title: "Note NB", field: "note_NB"},
                             {title: "last_touched_NB", field: "last_touched_NB"},
                             {title: "last_touched_by_NB", field: "last_touched_by_NB"},
-                            {title: "last_touched", field: "last_touched", formatter: this.formatUnixTime},
+                            {
+                                title: "last_touched", field: "last_touched",
+                                formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "last_touched_by", field: "last_touched_by"}
                         ]
                     },
@@ -793,7 +852,10 @@ class Table {
                             {title: "Destination error", field: "primary_destination_error"},
                             {title: "Fhm errors", field: "primary_fhm_errors"},
                             {title: "Invalid2", field: "primary_invalid2"},
-                            {title: "End run datetime utc", field: "primary_end_run_datetime_utc"},
+                            {
+                                title: "End run datetime utc", field: "primary_end_run_datetime_utc",
+                                formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Hotels recognized", field: "primary_hotels_recognized"},
                             {title: "Hotels specified proj", field: "primary_hotels_specified_proj"},
                             {title: "Destination user input proj", field: "primary_destination_user_input_proj"},
@@ -809,7 +871,10 @@ class Table {
                             {title: "Start date", field: "primary_start_date"},
                             {title: "End date", field: "primary_end_date"},
                             {title: "Is priority", field: "primary_is_priority"},
-                            {title: "Last touched", field: "primary_last_touched"},
+                            {
+                                title: "Last touched", field: "primary_last_touched",
+                                formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Last touched by", field: "primary_last_touched_by"},
                             {title: "Note", field: "primary_note"},
                             {title: "Last touched NB", field: "primary_last_touched_NB"},
@@ -886,7 +951,10 @@ class Table {
                     {title: "Destination Error", field: "destination_error"},
                     {title: "Flight Error", field: "flight_error"},
                     {title: "Hotel Duplicates", field: "hotel_dpl"},
-                    {title: "Last Touched", field: "last_touched"},
+                    {
+                        title: "Last Touched", field: "last_touched",
+                        formatter: this.formatUnixTime, formatterParams: () => {return this.formatDateToString}
+                    },
                     {title: "ID", field: "ID"},
                 ]
             },
@@ -906,17 +974,32 @@ class Table {
                     {
                         title: "Time Found",
                         columns: [
-                            {title: "Found BPTD UTC", field: "found_BPTD_utc"},
-                            {title: "Found BPTS UTC", field: "found_BPTS_utc"},
+                            {
+                                title: "Found BPTD UTC", field: "found_BPTD_utc",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Found BPTS UTC", field: "found_BPTS_utc",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                         ]
                     },
                     {
                         title: "OUT general",
                         visible: false,
                         columns: [
-                            {title: "BPTD Departure", field: "out_BPTD_departure"},
-                            {title: "BPTS Departure", field: "out_BPTS_departure"},
-                            {title: "BPT Arrival", field: "out_BPT_arrival"},
+                            {
+                                title: "BPTD Departure", field: "out_BPTD_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "BPTS Departure", field: "out_BPTS_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "BPT Arrival", field: "out_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Duration", field: "out_duration"},
                             {title: "Segments Count", field: "out_segments_count"},
                             {title: "Legs Count", field: "out_legs_count"},
@@ -954,8 +1037,14 @@ class Table {
                             {title: "Seg1 Carrier", field: "out_seg1_carrier_code"},
                             {title: "Seg1 Operating Carrier", field: "out_seg1_operating_carrier_code"},
                             {title: "Seg1 Flight Number", field: "out_seg1_flight_number"},
-                            {title: "Seg1 BPT Departure", field: "out_seg1_BPT_departure"},
-                            {title: "Seg1 BPT Arrival", field: "out_seg1_BPT_arrival"},
+                            {
+                                title: "Seg1 BPT Departure", field: "out_seg1_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg1 BPT Arrival", field: "out_seg1_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg1 Flight Duration", field: "out_seg1_flight_duration"},
                             {title: "Seg1 Equipment", field: "out_seg1_equipment"},
                             {title: "Seg1 Legs Count", field: "out_seg1_legs_count"},
@@ -970,8 +1059,14 @@ class Table {
                             {title: "Seg2 Carrier", field: "out_seg2_carrier_code"},
                             {title: "Seg2 Operating Carrier", field: "out_seg2_operating_carrier_code"},
                             {title: "Seg2 Flight Number", field: "out_seg2_flight_number"},
-                            {title: "Seg2 BPT Departure", field: "out_seg2_BPT_departure"},
-                            {title: "Seg2 BPT Arrival", field: "out_seg2_BPT_arrival"},
+                            {
+                                title: "Seg2 BPT Departure", field: "out_seg2_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg2 BPT Arrival", field: "out_seg2_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg2 Flight Duration", field: "out_seg2_flight_duration"},
                             {title: "Seg2 Equipment", field: "out_seg2_equipment"},
                             {title: "Seg2 Legs Count", field: "out_seg2_legs_count"},
@@ -986,8 +1081,14 @@ class Table {
                             {title: "Seg3 Carrier", field: "out_seg3_carrier_code"},
                             {title: "Seg3 Operating Carrier", field: "out_seg3_operating_carrier_code"},
                             {title: "Seg3 Flight Number", field: "out_seg3_flight_number"},
-                            {title: "Seg3 BPT Departure", field: "out_seg3_BPT_departure"},
-                            {title: "Seg3 BPT Arrival", field: "out_seg3_BPT_arrival"},
+                            {
+                                title: "Seg3 BPT Departure", field: "out_seg3_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg3 BPT Arrival", field: "out_seg3_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg3 Flight Duration", field: "out_seg3_flight_duration"},
                             {title: "Seg3 Equipment", field: "out_seg3_equipment"},
                             {title: "Seg3 Legs Count", field: "out_seg3_legs_count"},
@@ -1003,9 +1104,18 @@ class Table {
                         title: "IN General",
                         visible: false,
                         columns: [
-                            {title: "BPTD Departure", field: "in_BPTD_departure"},
-                            {title: "BPTS Departure", field: "in_BPTS_departure"},
-                            {title: "BPT Arrival", field: "in_BPT_arrival"},
+                            {
+                                title: "BPTD Departure", field: "in_BPTD_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "BPTS Departure", field: "in_BPTS_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "BPT Arrival", field: "in_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Duration", field: "in_duration"},
                             {title: "Segments Count", field: "in_segments_count"},
                             {title: "Legs Count", field: "in_legs_count"},
@@ -1043,8 +1153,14 @@ class Table {
                             {title: "Seg1 Carrier", field: "in_seg1_carrier_code"},
                             {title: "Seg1 Operating Carrier", field: "in_seg1_operating_carrier_code"},
                             {title: "Seg1 Flight Number", field: "in_seg1_flight_number"},
-                            {title: "Seg1 BPT Departure", field: "in_seg1_BPT_departure"},
-                            {title: "Seg1 BPT Arrival", field: "in_seg1_BPT_arrival"},
+                            {
+                                title: "Seg1 BPT Departure", field: "in_seg1_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg1 BPT Arrival", field: "in_seg1_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg1 Flight Duration", field: "in_seg1_flight_duration"},
                             {title: "Seg1 Equipment", field: "in_seg1_equipment"},
                             {title: "Seg1 Legs Count", field: "in_seg1_legs_count"},
@@ -1059,8 +1175,14 @@ class Table {
                             {title: "Seg1 Carrier", field: "in_seg2_carrier_code"},
                             {title: "Seg1 Operating Carrier", field: "in_seg2_operating_carrier_code"},
                             {title: "Seg1 Flight Number", field: "in_seg2_flight_number"},
-                            {title: "Seg1 BPT Departure", field: "in_seg2_BPT_departure"},
-                            {title: "Seg1 BPT Arrival", field: "in_seg2_BPT_arrival"},
+                            {
+                                title: "Seg1 BPT Departure", field: "in_seg2_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg1 BPT Arrival", field: "in_seg2_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg1 Flight Duration", field: "in_seg2_flight_duration"},
                             {title: "Seg1 Equipment", field: "in_seg2_equipment"},
                             {title: "Seg1 Legs Count", field: "in_seg2_legs_count"},
@@ -1075,8 +1197,14 @@ class Table {
                             {title: "Seg1 Carrier", field: "in_seg3_carrier_code"},
                             {title: "Seg1 Operating Carrier", field: "in_seg3_operating_carrier_code"},
                             {title: "Seg1 Flight Number", field: "in_seg3_flight_number"},
-                            {title: "Seg1 BPT Departure", field: "in_seg3_BPT_departure"},
-                            {title: "Seg1 BPT Arrival", field: "in_seg3_BPT_arrival"},
+                            {
+                                title: "Seg1 BPT Departure", field: "in_seg3_BPT_departure",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Seg1 BPT Arrival", field: "in_seg3_BPT_arrival",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Seg1 Flight Duration", field: "in_seg3_flight_duration"},
                             {title: "Seg1 Equipment", field: "in_seg3_equipment"},
                             {title: "Seg1 Legs Count", field: "in_seg3_legs_count"},
@@ -1133,8 +1261,14 @@ class Table {
                             type === "valid" ?
                             {title: "Currency Rate Fate to USD", field: "currency_rate_fare_to_usd"} :
                             {title: "Currency Rate Fate to USD x1000000000", field: "currency_rate_fare_to_usd_x1000000000"},
-                            {title: "Currency Rate Fare Date BPTD", field: "currency_rate_fare_date_BPTD"},
-                            {title: "BPT Inserted UTC", field: "bpt_inserted_utc"},
+                            {
+                                title: "Currency Rate Fare Date BPTD", field: "currency_rate_fare_date_BPTD",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "BPT Inserted UTC", field: "bpt_inserted_utc",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Passenger Count", field: "trip_passenger_count"},
                             {title: "Passenger Type", field: "trip_passenger_type"},
                             {title: "Included Extras dict", field: "trip_included_extras_dictionary"},
@@ -1167,8 +1301,14 @@ class Table {
                         columns: [
                             {title: "Hotel included", field: "hotel_is_included"},
                             {title: "Rating Searched", field: "hotel_rating_searched"},
-                            {title: "Check In BPTD", field: "hotel_check_in_bptd"},
-                            {title: "Check Out BPTD", field: "hotel_check_out_bptd"},
+                            {
+                                title: "Check In BPTD", field: "hotel_check_in_bptd",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Check Out BPTD", field: "hotel_check_out_bptd",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Nights Stay", field: "hotel_nights_stay"},
                             {title: "Associaled Location Code", field: "hotel_associated_location_code"},
                             {title: "Location Code Type", field: "hotel_location_code_type"},
@@ -1240,10 +1380,22 @@ class Table {
                             {title: "Pickup Location Type", field: "car_pickup_location_type"},
                             {title: "Dropoff Location", field: "car_dropoff_location"},
                             {title: "Dropoff Location Type", field: "car_dropoff_location_type"},
-                            {title: "Pickup BPTD", field: "car_pickup_bptd"},
-                            {title: "Pickup BPTS", field: "car_pickup_bpts"},
-                            {title: "Dropoff BPTD", field: "car_dropoff_bptd"},
-                            {title: "Dropoff BPTS", field: "car_dropoff_bpts"},
+                            {
+                                title: "Pickup BPTD", field: "car_pickup_bptd",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Pickup BPTS", field: "car_pickup_bpts",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Dropoff BPTD", field: "car_dropoff_bptd",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
+                            {
+                                title: "Dropoff BPTS", field: "car_dropoff_bpts",
+                                formatter: this.formatBPTTime, formatterParams: () => {return this.formatDateToString}
+                            },
                             {title: "Payment Type", field: "car_payment_type"},
                             type === "valid" ?
                             {title: "Rate exc", field: "car_rate_exc"} :
