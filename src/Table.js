@@ -224,8 +224,14 @@ class Table {
                         for (const innerColumn of column.columns) {
                             let columnDataContainer = document.createElement('li');
                             columnDataContainer.classList.add('column-data');
+
+                            const formatter = innerColumn.formatter;
+                            let cellValue;
+                            if (formatter) {
+                                cellValue = formatter(cell.getRow().getCell(innerColumn.field), innerColumn.formatterParams());
+                            }
     
-                            columnDataContainer.innerText = `${innerColumn.field}: ${rowData[innerColumn.field]}`;
+                            columnDataContainer.innerText = `${innerColumn.field}: ${cellValue ?? rowData[innerColumn.field]}`;
     
                             columnGroup.appendChild(columnDataContainer);
                         }
