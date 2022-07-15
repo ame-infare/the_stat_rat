@@ -516,6 +516,13 @@ class Table {
         }).join(", ");
     }
 
+    formatScheduleFrequencyType(cell) {
+        const cellValue = cell.getValue();
+        const types = ['Daily', 'Weekly', 'Monthly'];
+        const type = types[cellValue];
+        return type ?? 0;
+    }
+
     headerMenu() {
         let menu = [];
         const columns = this.getColumns();
@@ -811,7 +818,7 @@ class Table {
                         title: "Schedule",
                         visible: false,
                         columns: [
-                            {title: "Schedule frequency type", field: "schedule_frequency_type"},
+                            {title: "Schedule frequency type", field: "schedule_frequency_type", formatter: this.formatScheduleFrequencyType},
                             {title: "Schedule frequency interval", field: "schedule_frequency_interval"},
                             {title: "Schedule frequency interval relative", field: "schedule_frequency_interval_relative"},
                             {title: "Schedule id", field: "collection_schedule_id"},
