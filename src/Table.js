@@ -228,7 +228,8 @@ class Table {
                             const formatter = innerColumn.formatter;
                             let cellValue;
                             if (formatter) {
-                                cellValue = formatter(cell.getRow().getCell(innerColumn.field), innerColumn.formatterParams());
+                                let formatterParams = innerColumn.formatterParams;
+                                cellValue = formatterParams ? formatter(cell.getRow().getCell(innerColumn.field), formatterParams()) : formatter(cell.getRow().getCell(innerColumn.field));
                             }
     
                             columnDataContainer.innerText = `${innerColumn.field}: ${cellValue ?? rowData[innerColumn.field]}`;
@@ -502,6 +503,17 @@ class Table {
         }
 
         return cellValueBPT;
+    }
+
+    formatBinaryWeekDays(cell) {
+        const decimalValue = cell.getValue();
+        const binaryString = (decimalValue >>> 0).toString(2);
+        const weekdaysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        return weekdaysList.filter((weekday, index) => {
+            if (binaryString[index] === '1') {
+                return weekday;
+            }
+        }).join(", ");
     }
 
     headerMenu() {
@@ -791,7 +803,7 @@ class Table {
                         columns: [
                             {title: "Search range days", field: "search_range_days"},
                             {title: "Search range anchor date", field: "search_range_anchor_date"},
-                            {title: "Search weekdays", field: "search_weekdays"},
+                            {title: "Search weekdays", field: "search_weekdays", formatter: this.formatBinaryWeekDays},
                             {title: "Search nights", field: "search_nights"}
                         ]
                     },
