@@ -508,35 +508,36 @@ class Table {
     statsCellColoring(cell) {
         let columnName = cell.getColumn().getDefinition().field;
         let cellValue = cell.getValue();
+        let element = cell.getElement();
 
-        function makeRed(value) {
-            let element = document.createElement('div');
-            element.innerText = value;
+        function makeRed(element) {
             element.style.color = "white";
             element.style.fontWeight = "bold";
-            element.style.backgroundColor = "rgba(220,20,60,0.6)";
+            element.style.backgroundColor = "rgb(255 101 0 / 50%)";
             return element;
         }
 
-        if (columnName === 'd_err') {
-            return cellValue > 0 ? makeRed(cellValue) : cellValue;
-        } else if (columnName === 'no_res') {
-            return cellValue ? makeRed(cellValue) : cellValue;
-        } else if (columnName === '%miss') {
-            return cellValue > 4 ? makeRed(cellValue) : cellValue;
-        } else if (columnName === 'sub_mis') {
-            return cellValue > 4 ? makeRed(cellValue) : cellValue;
-        } else if (columnName === '%inv') {
-            return cellValue > 4 ? makeRed(cellValue) : cellValue;
+        if (columnName === 'd_err' && cellValue > 0) {
+            makeRed(element);
+        } else if (columnName === 'no_res' && cellValue) {
+            makeRed(element);
+        } else if ((columnName === '%miss' || columnName === 'sub_mis' || columnName === '%inv') && cellValue > 4) {
+            makeRed(element);
         } else if (columnName === 'tx_inv') {
             let txInvPc = cell.getData()['%tx_inv'];
-            return cellValue > 20 && txInvPc > 1 ? makeRed(cellValue) : cellValue;
+            if (cellValue > 20 && txInvPc > 1) {
+                makeRed(element);
+            }
         } else if (columnName === '%tx_inv') {
             let txInv = cell.getData()['tx_inv'];
-            return cellValue > 1 && txInv > 20 ? makeRed(cellValue) : cellValue;
+            if (cellValue > 1 && txInv > 20) {
+                makeRed(element);
+            }
         } else if (columnName === '%tx_miss') {
             let limit = cell.getData()['%tx_limit'];
-            return cellValue - limit > 15 ? makeRed(cellValue) : cellValue;
+            if (cellValue - limit > 15) {
+                makeRed(element);
+            }
         }
 
         return cellValue;
