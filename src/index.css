@@ -262,3 +262,20 @@ body {
 .not-bookable input {
     margin: 5px;
 }
+
+/* tabulator menu to toggle columns */
+.tabulator-menu {
+    display: flex;
+    flex-wrap: wrap;
+    writing-mode: vertical-lr;
+    text-orientation: upright;
+    height: 600px;
+    max-height: max-content;
+}
+.tabulator-menu * {
+    writing-mode: horizontal-tb;
+}
+.column-name-popup.hidden {
+    background-color: #c78a8a;
+    color: white;
+}
