@@ -581,8 +581,6 @@ class Table {
                 layout: "fitDataFill",
                 height: "100%",
                 selectable: true,
-                pagination: true,
-                paginationSize: 100,
                 columnDefaults: {
                     headerMenu: this.headerMenu,
                 }
@@ -894,7 +892,6 @@ class Table {
     
             validInvalid: type => { return {
                 rowFormatter: this.expandableRow,
-                paginationSize: 30,
     
                 columns: [
                     {
