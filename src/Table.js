@@ -505,7 +505,7 @@ class Table {
        return menu;
     }
 
-    statsFormatter(cell) {
+    statsCellColoring(cell) {
         let columnName = cell.getColumn().getDefinition().field;
         let cellValue = cell.getValue();
 
@@ -605,15 +605,15 @@ class Table {
                     {title: "Code", field: "code"},
                     {title: "Filter id", field: "filter_id"},
                     {title: "Subs", field: "subs"},
-                    {title: "Dest err", field: "d_err", formatter: this.statsFormatter},
-                    {title: "no resolution", field: "no_res", formatter: this.statsFormatter},
-                    {title: "Subs miss", field: "sub_mis", formatter: this.statsFormatter},
-                    {title: "%miss", field: "%miss", formatter: this.statsFormatter},
+                    {title: "Dest err", field: "d_err", formatter: this.statsCellColoring},
+                    {title: "no resolution", field: "no_res", formatter: this.statsCellColoring},
+                    {title: "Subs miss", field: "sub_mis", formatter: this.statsCellColoring},
+                    {title: "%miss", field: "%miss", formatter: this.statsCellColoring},
                     {title: "Valid", field: "valid"},
-                    {title: "%inv", field: "%inv", formatter: this.statsFormatter},
-                    {title: "tx_inv", field: "tx_inv", formatter: this.statsFormatter},
-                    {title: "%tx_inv", field: "%tx_inv", formatter: this.statsFormatter},
-                    {title: "%tx_miss", field: "%tx_miss", formatter: this.statsFormatter},
+                    {title: "%inv", field: "%inv", formatter: this.statsCellColoring},
+                    {title: "tx_inv", field: "tx_inv", formatter: this.statsCellColoring},
+                    {title: "%tx_inv", field: "%tx_inv", formatter: this.statsCellColoring},
+                    {title: "%tx_miss", field: "%tx_miss", formatter: this.statsCellColoring},
                     {title: "%tx_limit", field: "%tx_limit"},
                     {
                         title: "Issue date", field: "issue_date",
