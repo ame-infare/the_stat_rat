@@ -24,8 +24,8 @@ class Table {
         this.numOfSelectedRowsDial.innerText = '0';
     }
 
-    async createTable(dataToSend) {
-        let tableData = await this.getDataFromDb(dataToSend);
+    async createTable() {
+        let tableData = await this.getDataFromDb(this.dataToSend);
 
         if (tableData.length === 0) {
             return;
@@ -33,19 +33,27 @@ class Table {
 
         this.template.data = tableData;
 
-        // Add dctDebugDictionary columns
-        if (this.type === 'valid' || this.type === 'invalid') {          
-            let row = tableData[0];
-            for (const key of Object.keys(row)){
-                if (key.startsWith('ddd_')) {
-                    this.template.columns.find(x => x.title === 'Debug Dict').columns.push({title: key.slice(4), field: key, headerFilter: true});
-                }
-            }
-        }
+        this.addDCTDebugDictAsColumns(tableData);
         
         this.table = new Tabulator(`#${this.tableId}`, this.template);
 
         this.finalSetup();
+    }
+
+    async refreshData() {
+        this.table.replaceData([]);
+
+        let tableData = await this.getDataFromDb(this.dataToSend);
+
+        if (tableData.length === 0) {
+            return;
+        }
+
+        this.addDCTDebugDictAsColumns(tableData);
+
+        this.toggleInvisibleColumnGroups();
+
+        this.table.replaceData(tableData);
     }
 
     async getDataFromDb(dataToSend) {
@@ -68,6 +76,21 @@ class Table {
                 resolve(results[0]);
             });
         });
+    }
+
+    addDCTDebugDictAsColumns(tableData) {
+        if (this.type === 'valid' || this.type === 'invalid') {          
+            let row = tableData[0];
+            for (const key of Object.keys(row)){
+                const DCT_DebugDictColumn = this.template.columns.find(x => x.title === 'Debug Dict');
+                if (key.startsWith('ddd_')) {
+                    const columnObjToAdd = {title: key.slice(4), field: key, headerFilter: true};
+                    if (!DCT_DebugDictColumn.columns.includes(columnObjToAdd)) {
+                        DCT_DebugDictColumn.columns.push(columnObjToAdd);
+                    }
+                }
+            }
+        }
     }
 
     addColumnsAsOptionsForFilterButton() {

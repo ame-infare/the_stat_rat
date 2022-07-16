@@ -11,6 +11,7 @@ async function openNewTab(selectedRows, windowName) {
         let rowsData = selectedRows.length > 0 ? Array.from(selectedRows, x => x.getData()) : null;
 
         allTables[elementId] = new Table(windowName, elementId);
+        allTables[elementId].dataToSend = rowsData;
 
         await createNavBarButton(rowsData, elementId);
 
@@ -25,7 +26,7 @@ async function openNewTab(selectedRows, windowName) {
             document.getElementById('nav').querySelector('li:last-child').click();
         }
 
-        allTables[elementId].createTable(rowsData);
+        allTables[elementId].createTable();
     }
 }
 
@@ -253,11 +254,14 @@ function setUpNavButton(button) {
 
 function setUpShortcutButtons() {
     document.onkeyup = event => {
+        const activeWindow = document.getElementsByClassName("window active")[0];
 
         //Ctrl + s copies selected sublines to clipboard
         if (event.ctrlKey && (event.key === 's' || event.key === 'S')) {
-            const activeWindow = document.getElementsByClassName("window active")[0];
             activeWindow.getElementsByClassName("copy-subs")[0]?.click();
+        } else if (event.key === 'F5') {
+            const activeTableId = activeWindow.id.replace('-window', '');
+            allTables[activeTableId].refreshData();
         }
     }
 }
