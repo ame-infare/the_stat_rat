@@ -507,13 +507,16 @@ class Table {
 
     formatBinaryWeekDays(cell) {
         const decimalValue = cell.getValue();
-        const binaryString = (decimalValue >>> 0).toString(2);
-        const weekdaysList = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        return weekdaysList.filter((weekday, index) => {
-            if (binaryString[index] === '1') {
-                return weekday;
-            }
-        }).join(", ");
+        const weekdaysList = ['Sun', 'Sat', 'Fri', 'Thu', 'Wed', 'Tue', 'Mon'];
+        if (decimalValue > 0 && decimalValue < 2 ** weekdaysList) {
+            const binaryString = (decimalValue >>> 0).toString(2);
+            
+            return weekdaysList.slice(weekdaysList.length() - binaryString.length()).filter((weekday, index) => {
+                if (binaryString[index] === '1') {
+                    return weekday;
+                }
+            }).reverse().join(", ");
+        }
     }
 
     formatScheduleFrequencyType(cell) {
