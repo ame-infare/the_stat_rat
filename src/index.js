@@ -135,18 +135,13 @@ async function setupButtons(elementId, newWindowTemplate) {
             event.stopPropagation();
             event.preventDefault();
             const selectedSubs = allTables[elementId].selectedRows.map(x => x.getData().subscription_line_id);
-            const sublinesString = `"${selectedSubs.join('", "')}"`;
-            navigator.clipboard.writeText(sublinesString);
+            if (selectedSubs.length > 0) {
+                const sublinesString = `"${selectedSubs.join('", "')}"`;
+                navigator.clipboard.writeText(sublinesString);
+            }
         }
 
         copySubs.addEventListener('click', copySubsToClipboard);
-
-        // document.onkeyup = e => {
-        //     const window = document.getElementById(`${elementId}-window`);
-        //     if (window.classList.contains('active') && e.ctrlKey && e.which === 83) {
-        //         copySubsToClipboard(e);
-        //     }
-        // }
     }
 
     //handling filter form button
@@ -256,5 +251,17 @@ function setUpNavButton(button) {
     });
 }
 
+function setUpShortcutButtons() {
+    document.onkeyup = event => {
+
+        //Ctrl + s copies selected sublines to clipboard
+        if (event.ctrlKey && (event.key === 's' || event.key === 'S')) {
+            const activeWindow = document.getElementsByClassName("window active")[0];
+            activeWindow.getElementsByClassName("copy-subs")[0]?.click();
+        }
+    }
+}
+
 // Initial Stats Load
 openNewTab([], 'stats');
+setUpShortcutButtons();
