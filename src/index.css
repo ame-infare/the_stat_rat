@@ -139,8 +139,36 @@ body {
     color: var(--tab-light-color);
     font-size: 15px;
     text-align: center;
+    
+    display: flex;
+    gap: 0 10px;
+    align-items: center;
 
     transition: 0.04s;
+}
+
+.deselect {
+    background-color: #79df68;;
+
+    height: 25px;
+    width: 25px;
+    border-radius: 25px;
+    line-height: 28px;
+}
+.deselect:hover {
+    animation-name: broom;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+@keyframes broom {
+    25% {transform: rotate(35deg);}
+    50% {
+        transform: rotate(-20deg);
+        background-color: #dfd768;
+    }
+    75% {transform: rotate(15deg);}
+    100% {transform: rotate(-18deg);}
 }
 
 .window-buttons > button:hover {

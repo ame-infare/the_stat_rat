@@ -91,7 +91,13 @@ async function setupButtons(elementId, newWindowTemplate) {
     if (loadSelectedButton) {
         let nextPageName = allTables[elementId].getTableOptions('loadSelectedNextPageName');
 
-        loadSelectedButton.addEventListener('click', function(event){
+        const clearSelected = loadSelectedButton.getElementsByClassName('deselect')[0];
+        clearSelected.addEventListener('click', event => {
+            event.stopPropagation();
+            allTables[elementId].clearSelections();
+        });
+
+        loadSelectedButton.addEventListener('click', event => {
             event.stopPropagation();
 
             openNewTab(allTables[elementId].selectedRows, nextPageName);
