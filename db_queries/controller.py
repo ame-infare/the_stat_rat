@@ -1,7 +1,9 @@
 from sys import argv
+
 import json
 import pyodbc
 import pandas as pd
+import requests
 
 def get_message():
     return json.loads(argv[1])
@@ -139,6 +141,18 @@ WHERE
 
 ORDER BY scheduler_active_queue_id, search_rank DESC
         """
+
+    # elif action == 'filterErrors':
+    #     data = data[0]
+        # queries = (
+        #     'log-type=filterError',
+        #     f'server={PRO244}'
+        #     f'date={2022-07-10}',
+        #     f'instance-id={194347954}',
+        #     f'booking-site-id={2385}',
+        #     f'data-source-id={163}',
+        #     f'trip-type={0}'
+        # )
 
     return db_query
 
